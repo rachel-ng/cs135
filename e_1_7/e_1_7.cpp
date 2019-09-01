@@ -1,11 +1,8 @@
-/*
-Author: Rachel Ng
-Course: CSCI-135
-Assignment: E1.7
+// Author: Rachel Ng
+// Course: CSCI-135
+// Assignment: E1.7
 
-Prints 3 lines
-
-*/
+// Takes and prints 3 lines
 
 #include <iostream>
 #include <string>
