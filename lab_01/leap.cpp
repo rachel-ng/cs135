@@ -1,11 +1,11 @@
 /*
-Author: your name
+Author: Rachel Ng
 Course: CSCI-136
-Instructor: their name
-Assignment: title, e.g., Lab1A
+Instructor: Zamansky
+Assignment: Lab1C
 
-Here, briefly, at least in one or a few sentences
-describe what the program does.
+When given a year
+Tells you if it's a leap year or a common year 
 */
 
 
@@ -13,6 +13,7 @@ describe what the program does.
 using namespace std;
 
 bool leap (int year) {
+    // returns a boolean with whether or not it's a leap year 
     if (year % 4 != 0) {
         return false;
     }

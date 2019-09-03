@@ -4,16 +4,15 @@ Course: CSCI-136
 Instructor: Zamansky
 Assignment: Lab1A
 
-Here, briefly, at least in one or a few sentences
-describe what the program does.
+Finds the smallest number of 2
 */
 
 
 #include <iostream>
 using namespace std;
 
-int smaller (int a, int b) 
-{
+int smaller (int a, int b) {
+    // finds the smaller of 2 nums
     if (a > b) {
         return b;
     }

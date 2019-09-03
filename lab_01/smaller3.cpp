@@ -1,19 +1,17 @@
 /*
-Author: your name
+Author: Rachel Ng
 Course: CSCI-136
-Instructor: their name
-Assignment: title, e.g., Lab1A
+Instructor: Zamansky
+Assignment: Lab1B
 
-Here, briefly, at least in one or a few sentences
-describe what the program does.
+Finds the smallest number of 3
 */
-
 
 #include <iostream>
 using namespace std;
 
-int smaller (int a, int b) 
-{
+int smaller (int a, int b) {
+    // finds the smaller of 2 nums
     if (a > b) {
         return b;
     }

@@ -10,19 +10,19 @@
 using namespace std;
 
 
-int costmill (int eff, int price) {
+double costmill (double eff, double price) {
     // cost per 100 miles 
     return (100 / eff) * price;
 }
 
-int dist (int gals, int eff) { 
+double dist (double gals, double eff) { 
     // how far the car can go with the gas in the tank 
     return gals * eff; 
 } 
 
 int main () {
 
-    int gals, eff, price; 
+    double gals, eff, price; 
 
     cout  << "Numbers of gallons of gas in the tank? "; 
     cin >> gals; 
