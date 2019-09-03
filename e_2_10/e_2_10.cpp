@@ -24,13 +24,13 @@ int main () {
 
     int gals, eff, price; 
 
-    cout  << "Numbers of gallons of gas in the tank"; 
+    cout  << "Numbers of gallons of gas in the tank? "; 
     cin >> gals; 
 
-    cout  << "Fuel efficiency in miles per gallon?"; 
+    cout  << "Fuel efficiency in miles per gallon? "; 
     cin >> eff;
 
-    cout  << "Price of gas per gallon?"; 
+    cout  << "Price of gas per gallon? "; 
     cin >> price;
 
     cout << "\n";
