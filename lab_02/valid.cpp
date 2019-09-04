@@ -1,7 +1,7 @@
 /* 
 Author: Rachel Ng 
 Course: CSCI-135
-Assignment: Project 1A
+Assignment: Lab 2A
 
 Validates numbers read from std::in
 Numbers must be 0 < s < 100
