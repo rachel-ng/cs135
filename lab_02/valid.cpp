@@ -1,6 +1,7 @@
 /* 
 Author: Rachel Ng 
-Course: CSCI-135
+Course: CSCI-136
+Instructor: Zamansky
 Assignment: Lab 2A
 
 Validates numbers read from std::in
