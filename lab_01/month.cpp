@@ -2,7 +2,7 @@
 Author: Rachel Ng
 Course: CSCI-136
 Instructor: Zamansky
-Assignment: Lab1C
+Assignment: Lab 1D
 
 Number of days in the given month
 Dependent if it's a leap year or a common year 
