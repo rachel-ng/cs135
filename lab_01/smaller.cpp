@@ -2,7 +2,7 @@
 Author: Rachel Ng
 Course: CSCI-136
 Instructor: Zamansky
-Assignment: Lab1A
+Assignment: Lab 1A
 
 Finds the smallest number of 2
 */
