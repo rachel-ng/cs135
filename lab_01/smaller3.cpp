@@ -2,7 +2,7 @@
 Author: Rachel Ng
 Course: CSCI-136
 Instructor: Zamansky
-Assignment: Lab1B
+Assignment: Lab 1B
 
 Finds the smallest number of 3
 */
