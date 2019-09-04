@@ -1,6 +1,7 @@
 /* 
 Author: Rachel Ng 
-Course: CSCI-135
+Course: CSCI-136
+Instructor: Zamansky
 Assignment: Project 1A
 
 Reads integers from std::cin and reports the sum 
