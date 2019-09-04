@@ -1,6 +1,7 @@
 /* 
 Author: Rachel Ng 
-Course: CSCI-135
+Course: CSCI-136
+Instructor: Zamansky
 Assignment: Lab 2C
 
 Creates an array of 10 integers
