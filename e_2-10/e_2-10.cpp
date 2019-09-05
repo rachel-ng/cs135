@@ -27,24 +27,24 @@ int main () {
 
     double gals, eff, price; 
 
-    cout  << "Numbers of gallons of gas in the tank? "; 
-    cin >> gals; 
+    std::cout  << "Numbers of gallons of gas in the tank? "; 
+    std::cin >> gals; 
 
-    cout  << "Fuel efficiency in miles per gallon? "; 
-    cin >> eff;
+    std::cout  << "Fuel efficiency in miles per gallon? "; 
+    std::cin >> eff;
 
-    cout  << "Price of gas per gallon? "; 
-    cin >> price;
+    std::cout  << "Price of gas per gallon? "; 
+    std::cin >> price;
 
-    cout << "\n";
+    std::cout << "\n";
 
-    cout << costmill(eff, price); 
+    std::cout << costmill(eff, price); 
 
-    cout << "\n";
+    std::cout << "\n";
     
-    cout << dist(gals, eff); 
+    std::cout << dist(gals, eff); 
 
-    cout << "\n";
+    std::cout << "\n";
     
     return 0; 
 }
