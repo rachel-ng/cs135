@@ -9,7 +9,6 @@ Finds the smallest number of 2
 
 
 #include <iostream>
-using namespace std;
 
 int smaller (int a, int b) {
     // finds the smaller of 2 nums
@@ -22,14 +21,14 @@ int smaller (int a, int b) {
 }
 
 int main() {
-    cout << "Enter the first number: ";
+    std::cout << "Enter the first number: ";
     int a; 
     int b;
-    cin >> a;
-    cout << "Enter the second number: ";
-    cin >> b;
-    cout << "\n";
-    cout << "The smaller of the two is " << smaller(a,b);
-    cout << "\n";
+    std::cin >> a;
+    std::cout << "Enter the second number: ";
+    std::cin >> b;
+    std::cout << "\n";
+    std::cout << "The smaller of the two is " << smaller(a,b);
+    std::cout << "\n";
 }
 

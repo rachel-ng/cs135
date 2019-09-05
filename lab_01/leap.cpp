@@ -10,7 +10,6 @@ Tells you if it's a leap year or a common year
 
 
 #include <iostream>
-using namespace std;
 
 bool leap (int year) {
     // returns a boolean with whether or not it's a leap year 
@@ -29,14 +28,14 @@ bool leap (int year) {
  
 }
 int main() {
-    cout << "Enter year: ";
+    std::cout << "Enter year: ";
     int y;
-    cin >> y;
-    cout << "\n";
+    std::cin >> y;
+    std::cout << "\n";
     if (leap(y) == true) {
-        cout << "Leap year\n";
+        std::cout << "Leap year\n";
     }
     else {
-        cout << "Common year\n";
+        std::cout << "Common year\n";
     }
 }

@@ -10,7 +10,6 @@ Dependent if it's a leap year or a common year
 
 
 #include <iostream>
-using namespace std;
 
 bool leap (int year) {
     // boolean with whether or not it's a leap year
@@ -60,14 +59,14 @@ int days (int month, int year) {
 }
 
 int main() {
-    cout << "Enter year: ";
+    std::cout << "Enter year: ";
     int y;
-    cin >> y;
+    std::cin >> y;
 
-    cout << "Enter month: ";
+    std::cout << "Enter month: ";
     int m;
-    cin >> m;
+    std::cin >> m;
 
-    cout << "\n";
-    cout << days(m,y) << "days \n";    
+    std::cout << "\n";
+    std::cout << days(m,y) << " days \n";    
 }

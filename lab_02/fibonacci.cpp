@@ -11,9 +11,8 @@ Uses an array to store ints
 #include <iostream>
 
 /*
-As the numbers approach 2 billions they begin to switch between negative and positive at random. 
-The negative numbers stay the same when the program has been run multiple times separately. 
-It seems like there's a limit on how big an integer can get in C++. 
+As the numbers approach 2 billion they begin to overflow because it is larger than the number can hold.
+ints have a range limited to -2147483648 to 2147483647, and when it goes over that the numbers are truncated to fit. 
 */
 
 int main() {

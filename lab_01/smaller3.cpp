@@ -8,7 +8,6 @@ Finds the smallest number of 3
 */
 
 #include <iostream>
-using namespace std;
 
 int smaller (int a, int b) {
     // finds the smaller of 2 nums
@@ -21,17 +20,17 @@ int smaller (int a, int b) {
 }
 
 int main() {
-    cout << "Enter the first number: ";
+    std::cout << "Enter the first number: ";
     int a; 
     int b;
     int c;
-    cin >> a;
-    cout << "Enter the second number: ";
-    cin >> b;
-    cout << "Enter the third number: ";
-    cin >> c;
-    cout << "\n";
-    cout << "The smaller of the three is " << smaller(smaller(a,b),c); 
-    cout << "\n";
+    std::cin >> a;
+    std::cout << "Enter the second number: ";
+    std::cin >> b;
+    std::cout << "Enter the third number: ";
+    std::cin >> c;
+    std::cout << "\n";
+    std::cout << "The smaller of the three is " << smaller(smaller(a,b),c); 
+    std::cout << "\n";
 }
 
