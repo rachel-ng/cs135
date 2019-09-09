@@ -27,9 +27,7 @@ int main() {
             else if (op == '-') {
                 n -= s * s;
             }
-            
             std::cin >> op; 
-            
             if (op == ';') {
                 if (op == '+') {
                     n += s;
