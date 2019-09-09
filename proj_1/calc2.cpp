@@ -2,23 +2,21 @@
 Author: Rachel Ng 
 Course: CSCI-136
 Instructor: Zamansky
-Assignment: E2.10
+Assignment: Project 1C
 
-Given the gallons of gas in a tank, fuel efficiency in miles per gallon, and the price of gas per gallon 
-Prints the cost per 100 miles and how far a car can go with the gas in the tank 
+A calculator that takes multiple formulas
 */
 
 
 #include <iostream>
 #include <string>
 
-using namespace std;
 
 int main() {
     int s;
     int n = 0;
     char op = '+';
-    while (cin >> s) {;
+    while (std::cin >> s) {;
         if (op == '+') {
             n += s;
         }
@@ -26,11 +24,11 @@ int main() {
             n -= s;
         }
         else if (op == ';') {
-            cout << n << endl;
+            std::cout << n << std::endl;
             n = s;
         }
-        cin >> op;
+        std::cin >> op;
     }
-    cout << n << endl;
+    std::cout << n << std::endl;
     return 0;
 }

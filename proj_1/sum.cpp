@@ -9,14 +9,13 @@ Reads integers from std::cin and reports the sum
 
 #include <iostream>
 
-using namespace std;
 
 int main() {
     int s;
     int n = 0;
-    while (cin >> s) {;
+    while (std::cin >> s) {;
         n += s; // sums the numbers 
     }
-    cout << n << endl;
+    std::cout << n << std:;endl;
     return 0;
 }

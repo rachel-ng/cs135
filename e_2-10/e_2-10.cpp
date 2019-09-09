@@ -10,7 +10,6 @@ Prints the cost per 100 miles and how far a car can go with the gas in the tank
 
 
 #include <iostream>
-using namespace std;
 
 
 double costmill (double eff, double price) {

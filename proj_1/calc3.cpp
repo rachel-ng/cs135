@@ -2,36 +2,72 @@
 Author: Rachel Ng 
 Course: CSCI-136
 Instructor: Zamansky
-Assignment: E2.10
+Assignment: Project 1D
 
-Given the gallons of gas in a tank, fuel efficiency in miles per gallon, and the price of gas per gallon 
-Prints the cost per 100 miles and how far a car can go with the gas in the tank 
+A calculator that takes multiple formulas
+Also accounts for squares
 */
 
 
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 int main() {
     int s;
     int n = 0;
+    char ope;
     char op = '+';
-    while (cin >> s) {;
-        if (op == '+') {
-            n += s;
-        }
-        else if (op == '-') {
-            n -= s;
-        }
-        else if (op == ';') {
-            cout << n << endl;
-            n = s;
-        }
-        cin >> op;
+    while (std::cin >> s) {
+        std::cin >> ope;
 
+        if (ope == '^') {
+            if (op == '+') {
+                n += s * s;
+            }
+            else if (op == '-') {
+                n -= s * s;
+            }
+            
+            std::cin >> op; 
+            
+            if (op == ';') {
+                if (op == '+') {
+                    n += s;
+                }
+                else if (op == '-') {
+                    n -= s;
+                }
+
+                std::cout << n << std::endl;
+                
+                op = '+';
+                n = 0;
+            }
+        }
+
+        else if (ope == ';') {
+            if (op == '+') {
+                n += s;
+            }
+            else if (op == '-') {
+                n -= s;
+            }
+
+            std::cout << n << std::endl;
+            op = '+';
+            n = 0;
+        }
+        else {
+            if (op == '+') {
+                n += s;
+                op = ope;   
+            }
+            else if (op == '-') {
+                n -= s;
+                op = ope;   
+            }
+        }
     }
-    cout << n << endl;
+    
     return 0;
 }
