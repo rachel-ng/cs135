@@ -44,7 +44,6 @@ int main() {
                 n = 0;
             }
         }
-
         else if (ope == ';') {
             if (op == '+') {
                 n += s;
