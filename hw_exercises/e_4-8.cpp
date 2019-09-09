@@ -6,6 +6,9 @@ Assignment: E4.8
 
 */
 
+// Takes an input
+// Prints each of the characters of the given input
+
 #include <iostream> 
 #include <string>
 
