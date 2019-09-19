@@ -23,11 +23,22 @@ int main() {
     for (int h = 0; h < size; h++){ // rows
         for (int w = 0; w < size; w++){ // cols
             // diagonal cross pattern
-            if (w == size - h or w == h-1){
-                std::cout << "*"; 
+            if (size % 2 == 0) {
+                if (w == size - h or w == h){
+                    std::cout << "*"; 
+                }
+                else {
+                    std::cout << " ";
+                }
             }
             else {
-                std::cout << " ";
+                if (w == size - h or w == h-1){
+                    std::cout << "*"; 
+                }
+                else {
+                    std::cout << " ";
+                }
+ 
             }
         }
         std::cout << "\n";
