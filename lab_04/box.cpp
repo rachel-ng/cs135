@@ -1,3 +1,14 @@
+/* 
+Author: Rachel Ng 
+Course: CSCI-136
+Instructor: Zamansky
+Assignment: Lab 4A
+
+Takes a width and height
+Prints a box made of '*' with the specified dimensions
+*/
+
+
 #include <iostream>
 
 int main() {
