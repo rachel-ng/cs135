@@ -16,7 +16,7 @@ int main() {
     int s;
     int n = 0;
     char op = '+';
-    while (std::cin >> s) {;
+    while (std::cin >> s) {
         if (op == '+') {
             n += s;
         }
@@ -24,6 +24,7 @@ int main() {
             n -= s;
         }
         else if (op == ';') {
+            // if there's a semicolon the function terminates
             std::cout << n << std::endl;
             n = s;
         }

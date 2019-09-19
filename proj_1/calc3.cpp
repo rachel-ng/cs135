@@ -20,7 +20,7 @@ int main() {
     while (std::cin >> s) {
         std::cin >> ope;
 
-        if (ope == '^') {
+        if (ope == '^') { // handles square
             if (op == '+') {
                 n += s * s;
             }
@@ -28,7 +28,7 @@ int main() {
                 n -= s * s;
             }
             std::cin >> op; 
-            if (op == ';') {
+            if (op == ';') { // checks if it terminates at the next char
                 if (op == '+') {
                     n += s;
                 }
@@ -42,7 +42,7 @@ int main() {
                 n = 0;
             }
         }
-        else if (ope == ';') {
+        else if (ope == ';') { // if formula terminates
             if (op == '+') {
                 n += s;
             }
