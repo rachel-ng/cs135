@@ -72,7 +72,7 @@ int main() {
     }
 
     for (int i = vals - 1; i >= 0; i--) {
-        std::cout << days[i] << " " << elevations[i] << std::endl;
+        std::cout << days[i] << " " << elevations[i] << " ft" << std::endl;
     }
 
     fin.close();
