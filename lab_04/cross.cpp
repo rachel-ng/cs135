@@ -22,7 +22,7 @@ int main() {
     for (int h = 0; h < size; h++){ // rows
         for (int w = 0; w < size; w++){ // cols
             // diagonal cross pattern
-            if (w == size - h or w == h) { 
+            if (w == h or w == size - 1 - h) { 
                 std::cout << "*"; 
             }
             else {
