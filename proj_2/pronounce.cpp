@@ -89,7 +89,35 @@ bool checkReplace (std::string word, std::string wordpron, std::string dup, std:
 }
 
 bool checkAdd (std::string word, std::string wordpron, std::string dup, std::string duppron) {
-    return false;
+    int len = 0;
+    int sim = 0;
+    
+    std::string wb, wa, db, da;
+    wa = wordpron;
+    da = duppron;
+   
+    for (int i = 0; i < countSpaces(duppron) + 1; i++){ 
+        len ++;
+        
+        splitOnSpace(wa,wb,wa);
+        splitOnSpace(da,db,da);
+        //std::cout << wb << "\t" << db << std::endl;
+        if (wb == db) {
+            sim ++;
+        }
+        //std::cout << i << std::endl;
+    }
+
+    if (sim == len - 1) {
+        //std::cout << word << "\n" << dup << "\n" << std::endl;
+        //std::cout << wordpron << "\t" << countSpaces(duppron)<< "\n" << duppron << "\t" << countSpaces(duppron)<< "\n" << std::endl;
+        //std::cout << sim << "\n" << len << "\n" << std::endl;
+        return true;
+    }
+    else {
+        return false;
+    }
+
 }
 
 int main() {
@@ -110,7 +138,6 @@ int main() {
         bool val = true;
         for (int i = 0; i < word.length(); i++) {
             int c = word[i];
-            //if (!(c == 39 || c > 64 || (c > 90 && c < 97) || c > 122)) {
             if (!isalpha(c)) {
                 val = false;
             }
@@ -134,7 +161,6 @@ int main() {
         bool val = true;
         for (int i = 0; i < word.length(); i++) {
             int c = word[i];
-            //if (!(c == 39 || c > 64 || (c > 90 && c < 97) || c > 122)) {
             if (!isalpha(c)) {
                 val = false;
             }
@@ -144,12 +170,19 @@ int main() {
         }
         else if(val && countSpaces(inputpro) == countSpaces(pronun)) {
             if (checkReplace(input, inputpro, word, pronun)) {
-                replace += word + " (" + pronun + ") ";
+                replace += word + " "; 
             }
         }
+        else if(val && countSpaces(inputpro)+1 == countSpaces(pronun)) {
+            if (checkAdd(input, inputpro, word, pronun)) {
+                replace += word + " "; 
+            }
+        }
+
     }
     std::cout << "Identical\t: " << identical << std::endl; 
     std::cout << "Replace phoneme\t: " << replace << std::endl;
+    std::cout << "Add phoneme\t: " << add << std::endl;
     std::cout << std::endl;
    
 
