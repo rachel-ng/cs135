@@ -198,9 +198,6 @@ int main() {
             int c = word[i];
             if (!isalph(c)) {
                 val = false;
-                if(word[0] == 'P') {
-                    std::cout << word << std::endl;
-                }
             }
         }
         if (val && word == input) {
@@ -210,7 +207,7 @@ int main() {
         }
     }
     if (inputpro == "") {
-        std::cout << "Ding dong your input is wrong, try again." << std::endl;
+        std::cout << "Not found" << std::endl;
     }
 
     std::ifstream fin2("cmudict.0.7a.txt");
@@ -243,13 +240,13 @@ int main() {
             }
         }
     }
-    
-    std::cout << "Identical\t: " << identical << std::endl; 
-    std::cout << "Add phoneme\t: " << add << std::endl;
-    std::cout << "Remove phoneme\t: " << remove << std::endl;
-    std::cout << "Replace phoneme\t: " << replace << std::endl;
-    std::cout << std::endl;
-   
+    if (inputpro != "") { 
+        std::cout << "Identical\t: " << identical << std::endl; 
+        std::cout << "Add phoneme\t: " << add << std::endl;
+        std::cout << "Remove phoneme\t: " << remove << std::endl;
+        std::cout << "Replace phoneme\t: " << replace << std::endl;
+        std::cout << std::endl;
+    }
 
     return 0; 
 }
