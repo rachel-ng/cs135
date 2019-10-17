@@ -63,6 +63,9 @@ bool identicalPronun (std::string word, std::string wordpron, std::string dup, s
         return true;
     }
     else {
+        if (duppron[0] == 'P') {
+            std::cout << dup << "\n" << duppron << std::endl;
+        }
         return false;
     }
 }
