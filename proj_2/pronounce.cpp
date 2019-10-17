@@ -20,8 +20,11 @@ void upper(char & a){
     }
 }
 
-bool isalpha(char c) {
-    if ((c > 64 && c < 91) || (c > 96 && c < 123) || c == 39) {
+bool isalph(char c) {
+    if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
+        return true;
+    }
+    if (c == 39) {
         return true;
     }
     else {
@@ -63,9 +66,6 @@ bool identicalPronun (std::string word, std::string wordpron, std::string dup, s
         return true;
     }
     else {
-        if (duppron[0] == 'P') {
-            std::cout << dup << "\n" << duppron << std::endl;
-        }
         return false;
     }
 }
@@ -196,8 +196,11 @@ int main() {
         bool val = true;
         for (int i = 0; i < word.length(); i++) {
             int c = word[i];
-            if (!isalpha(c)) {
+            if (!isalph(c)) {
                 val = false;
+                if(word[0] == 'P') {
+                    std::cout << word << std::endl;
+                }
             }
         }
         if (val && word == input) {
@@ -217,7 +220,7 @@ int main() {
         bool val = true;
         for (int i = 0; i < word.length(); i++) {
             int c = word[i];
-            if (!isalpha(c)) {
+            if (!isalph(c)) {
                 val = false;
             }
         } 
