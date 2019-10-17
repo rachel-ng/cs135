@@ -1,3 +1,13 @@
+/* 
+Author: Rachel Ng 
+Course: CSCI-135
+Instructor: Maryash
+Assignment: Project 2
+
+Pronunciation dictionary
+*/
+
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -5,7 +15,7 @@
 
 void upper(char & a){
     int c = a;
-    if (c > 96 && c < 123){
+    if (c > 96 && c < 123 && c != 39){
         a = (char)c - 32;
     }
 }
@@ -98,17 +108,23 @@ bool checkAdd (std::string word, std::string wordpron, std::string dup, std::str
    
     for (int i = 0; i < countSpaces(duppron) + 1; i++){ 
         len ++;
-        
+         
         splitOnSpace(wa,wb,wa);
         splitOnSpace(da,db,da);
         //std::cout << wb << "\t" << db << std::endl;
         if (wb == db) {
             sim ++;
         }
+        else {
+            splitOnSpace(da,db,da);
+            if (wb == db) {
+                sim ++;
+            }
+        }
         //std::cout << i << std::endl;
     }
 
-    if (sim == len - 1) {
+    if (sim == len) {
         //std::cout << word << "\n" << dup << "\n" << std::endl;
         //std::cout << wordpron << "\t" << countSpaces(duppron)<< "\n" << duppron << "\t" << countSpaces(duppron)<< "\n" << std::endl;
         //std::cout << sim << "\n" << len << "\n" << std::endl;
@@ -119,6 +135,45 @@ bool checkAdd (std::string word, std::string wordpron, std::string dup, std::str
     }
 
 }
+
+bool checkRemove (std::string word, std::string wordpron, std::string dup, std::string duppron) {
+    int len = 0;
+    int sim = 0;
+    
+    std::string wb, wa, db, da;
+    wa = wordpron;
+    da = duppron;
+   
+    for (int i = 0; i < countSpaces(wordpron) + 1; i++){ 
+        len ++;
+         
+        splitOnSpace(wa,wb,wa);
+        splitOnSpace(da,db,da);
+        //std::cout << wb << "\t" << db << std::endl;
+        if (wb == db) {
+            sim ++;
+        }
+        else {
+            splitOnSpace(wa,wb,wa);
+            if (wb == db) {
+                sim ++;
+            }
+        }
+        //std::cout << i << std::endl;
+    }
+
+    if (sim == len) {
+        //std::cout << word << "\n" << dup << "\n" << std::endl;
+        //std::cout << wordpron << "\t" << countSpaces(duppron)<< "\n" << duppron << "\t" << countSpaces(duppron)<< "\n" << std::endl;
+        //std::cout << sim << "\n" << len << "\n" << std::endl;
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
 
 int main() {
 
@@ -131,7 +186,7 @@ int main() {
 
     std::ifstream fin("cmudict.0.7a.txt");
     
-    std::string line, word, pronun; 
+    std::string line, word, pronun, remove; 
     
     while(std::getline(fin, line)) {
         splitOnSpace(line, word, pronun);
@@ -144,15 +199,13 @@ int main() {
         }
         if (val && word == input) {
             inputpro = pronun;
-            std::cout << word << std::endl;
-            std::cout << "Pronunciation\t: " << pronun << std::endl;                
+            // std::cout << word << std::endl;
+            std::cout << "\nPronunciation\t: " << pronun << "\n" << std::endl;                
         }
     }
     if (inputpro == "") {
-        std::cout << "Not found" << std::endl;
+        std::cout << "Ding dong your input is wrong, try again." << std::endl;
     }
-
-    fin.close();
 
     std::ifstream fin2("cmudict.0.7a.txt");
  
@@ -175,14 +228,20 @@ int main() {
         }
         else if(val && countSpaces(inputpro)+1 == countSpaces(pronun)) {
             if (checkAdd(input, inputpro, word, pronun)) {
-                replace += word + " "; 
+                add += word + " "; 
             }
         }
-
+        else if(val && countSpaces(inputpro)-1 == countSpaces(pronun)) {
+            if (checkRemove(input, inputpro, word, pronun)) {
+                remove+= word + " "; 
+            }
+        }
     }
+    
     std::cout << "Identical\t: " << identical << std::endl; 
-    std::cout << "Replace phoneme\t: " << replace << std::endl;
     std::cout << "Add phoneme\t: " << add << std::endl;
+    std::cout << "Remove phoneme\t: " << remove << std::endl;
+    std::cout << "Replace phoneme\t: " << replace << std::endl;
     std::cout << std::endl;
    
 
