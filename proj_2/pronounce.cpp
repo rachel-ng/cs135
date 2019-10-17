@@ -209,38 +209,41 @@ int main() {
     if (inputpro == "") {
         std::cout << "Not found" << std::endl;
     }
-
-    std::ifstream fin2("cmudict.0.7a.txt");
- 
-    while(std::getline(fin2, line)) {
-        splitOnSpace(line, word, pronun);
-        bool val = true;
-        for (int i = 0; i < word.length(); i++) {
-            int c = word[i];
-            if (!isalph(c)) {
-                val = false;
+    else {
+        std::ifstream fin2("cmudict.0.7a.txt");
+     
+        while(std::getline(fin2, line)) {
+            splitOnSpace(line, word, pronun);
+            bool val = true;
+            for (int i = 0; i < word.length(); i++) {
+                int c = word[i];
+                if (!isalph(c)) {
+                    val = false;
+                }
+            } 
+            if (val && identicalPronun(input, inputpro, word, pronun)) {
+                // checks if the word is identical
+                identical += word + " ";                
             }
-        } 
-        if (val && identicalPronun(input, inputpro, word, pronun)) {
-            identical += word + " ";                
-        }
-        else if(val && countSpaces(inputpro) == countSpaces(pronun)) {
-            if (checkReplace(input, inputpro, word, pronun)) {
-                replace += word + " "; 
+            else if(val && countSpaces(inputpro) == countSpaces(pronun)) {
+                // checks if a phoneme is replaced 
+                if (checkReplace(input, inputpro, word, pronun)) {
+                    replace += word + " "; 
+                }
+            }
+            else if(val && countSpaces(inputpro)+1 == countSpaces(pronun)) {
+                // checks if a phoneme is added 
+                if (checkAdd(input, inputpro, word, pronun)) {
+                    add += word + " "; 
+                }
+            }
+            else if(val && countSpaces(inputpro)-1 == countSpaces(pronun)) {
+                // checks if a phoneme is removed
+                if (checkRemove(input, inputpro, word, pronun)) {
+                    remove+= word + " "; 
+                }
             }
         }
-        else if(val && countSpaces(inputpro)+1 == countSpaces(pronun)) {
-            if (checkAdd(input, inputpro, word, pronun)) {
-                add += word + " "; 
-            }
-        }
-        else if(val && countSpaces(inputpro)-1 == countSpaces(pronun)) {
-            if (checkRemove(input, inputpro, word, pronun)) {
-                remove+= word + " "; 
-            }
-        }
-    }
-    if (inputpro != "") { 
         std::cout << "Identical\t: " << identical << std::endl; 
         std::cout << "Add phoneme\t: " << add << std::endl;
         std::cout << "Remove phoneme\t: " << remove << std::endl;
