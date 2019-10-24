@@ -1,0 +1,42 @@
+* Fall 2019 - Lab 06
+
+* Last name:
+
+* First name:
+
+
+* GitHub username:
+
+* Notes:
+
+
+* General instructions:
+- Fill in your name and GitHub username on top.
+- Use the Notes section to add any notes to the instructor.
+- The main lab description can be found here:
+  https://maryash.github.io/135/labs/lab_07.html 
+- *DO NOT SUBMIT to Gradescope.*
+
+* Daedalus specific instructions (changes from main spec):
+
+This lab is starting with a mostly empty repository (only doctest. is
+present). 
+
+You will have to create the *Makefile* and decide on what *.cpp* and
+*.h* files you will need. 
+
+You will need at least two targets in your *Makefile* - *main* which
+will build the main program and *tests* which will build the
+tests. Use the previous labs files as a guide.
+
+For this lab, you will have to decide on a single function as an entry
+point and it should return a string representing the correctly
+formatted program. You will also have to decide what that function
+takes as a parameter or parameters (for example, a filename or a
+string representing the unformatted program) but remember that when
+the tests are run, there should be no user input - everything should
+be automated (you can require user input when the *main* target is run.
+
+Also remember you can embed "\n" in a string for a newline and "\t" for a
+tab and that you can compare strings to see if they are the same.
+
