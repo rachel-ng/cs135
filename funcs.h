@@ -1,3 +1,3 @@
 #pragma once
 
-string removeLeadingSpaces(string line);
+std::string removeLeadingSpaces(std::string line);

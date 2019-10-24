@@ -2,3 +2,7 @@
 
 #include "doctest.h"
 #include "funcs.h"
+TEST_CASE("Checks if spaces before first character is removed")
+{
+  CHECK(removeLeadingSpaces("  first test")=="first test");
+}

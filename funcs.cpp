@@ -1,5 +1,5 @@
 #include <iostream>
-string removeLeadingSpaceS(std::string line)
+std::string removeLeadingSpaceS(std::string line)
 {
   std::string output;
   bool isspacebeforeword = true;
