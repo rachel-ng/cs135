@@ -1,11 +1,11 @@
-* Fall 2019 - Lab 06
+* Fall 2019 - Lab 07
 
-* Last name:
+* Last name:Tse		
 
-* First name:
+* First name:John
 
 
-* GitHub username:
+* GitHub username:johntse1
 
 * Notes:
 
