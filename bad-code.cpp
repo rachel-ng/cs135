@@ -1,6 +1,8 @@
-#include <iostream> 
-    int main()
- {
-     std::cout << "this is the bad indentation code" << std::endl;
-         std::cout << "line1" << std::endl;
-   }
+                int main(){ 
+           // Hi, I'm a program!
+int x = 1; 
+    for(int i = 0; i < 10; i++) {
+cout << i;
+          cout << endl;
+ }
+    }
