@@ -2,7 +2,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest.h"
 #include "funcs.h"
-int main()
+int main(int argc, char *argv[])
 {
   /*
   std::string test1 = "       test1";

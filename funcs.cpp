@@ -44,20 +44,18 @@ std::string unindent()
 }
 std::string indentspacer(std::string input)
 {
-  std::string copy = input;
-  static int numindents = 0;
-  char a = '{'; char b = '}';
-  int end = countChar(input, b);
-  if(end > 0)
+  std::string result = result;
+  static int tracker = 0;
+  int numstarts; int numends;
+  for(int i =0; i < tracker; i++)
     {
-      numindents -= end;
+      result = '\t' + input;
     }
-  for(int i =0; i < numindents;i++)
-    {
-      copy = '\t' + input;
-    }
-  numindents += countChar(input, a);
-  return copy;
+  numstarts = countChar(result, '{');
+  numends = countChar(result,'}');
+  tracker += numstarts;
+  tracker -= numends;
+  return result;
 }
 std::string indent()
 {
