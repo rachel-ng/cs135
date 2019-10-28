@@ -15,8 +15,8 @@ class Point {
         double x;
         double y;
     public: 
-        Point();
-        Point(double, double);
+        void Point();
+        void Point(double, double);
     public:
         double getX() {
             return x;
