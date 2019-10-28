@@ -35,6 +35,11 @@ int main(){
     Point a, b;
     a = Point(1,2);
     b = Point(2,3);
+    std::cout << a.getX();
+    std::cout << a.getY();
+    std::cout << b.getX();
+    std::cout << b.getY();
+    
     std::cout << distance(a,b);
     return 0;
 }
