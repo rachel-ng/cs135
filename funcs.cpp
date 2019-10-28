@@ -42,6 +42,31 @@ std::string unindent()
       std::cout << output << std::endl;
     }
 }
-std::string indent(std::string input)
+std::string indentspacer(std::string input)
 {
+  std::string copy = input;
+  static int numindents = 0;
+  char a = '{'; char b = '}';
+  int end = countChar(input, b);
+  if(end > 0)
+    {
+      numindents -= end;
+    }
+  for(int i =0; i < numindents;i++)
+    {
+      copy = '\t' + input;
+    }
+  numindents += countChar(input, a);
+  return copy;
+}
+std::string indent()
+{
+  std::string result;
+  std::string line;
+  std::ifstream fin("bad-code.cpp");
+  while(getline(fin, line))
+    {
+      result += indentspacer(line);
+    }
+  std::cout << result << std::endl;
 }
