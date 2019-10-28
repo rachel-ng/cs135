@@ -15,7 +15,6 @@ class Point {
         double x;
         double y;
     public: 
-        void Point();
         void Point(double, double);
     public:
         double getX() {
