@@ -46,14 +46,15 @@ std::string indentspacer(std::string input)
 {
   std::string result = result;
   static int tracker = 0;
-  int numstarts; int numends;
+  int numstarts=0; int numends=0;
+
   for(int i =0; i < tracker; i++)
     {
       result = '\t' + input;
     }
   numstarts = countChar(result, '{');
-  numends = countChar(result,'}');
   tracker += numstarts;
+  numends = countChar(result,'}');
   tracker -= numends;
   return result;
 }
@@ -65,7 +66,7 @@ std::string indent()
   while(getline(fin, line))
     {
       result += indentspacer(line);
-      result += "\n";
+      result += '\n';
     }
   std::cout << result << std::endl;
 }
