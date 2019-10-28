@@ -11,34 +11,22 @@ Distance between points
 #include <cmath>
 
 class Point {
-    private: 
-        double x;
-        double y;
-    public: 
-        void Point(double, double);
-    public:
-        double getX() {
-            return x;
-        }
-        double getY() {
-            return y;
-        }
+public:
+    double x;
+    double y;
 };
 
 
 double distance(Point a, Point b) {
-    return pow(pow((b.getX() - a.getX()), 2) - pow((b.getY() - a.getY()),2), 0.5);
+    return pow((pow((b.x - a.x), 2) - pow((b.y - a.y),2)), 0.5);
 }
 
 int main(){
     Point a, b;
-    a = Point(1,2);
-    b = Point(2,3);
-    std::cout << a.getX();
-    std::cout << a.getY();
-    std::cout << b.getX();
-    std::cout << b.getY();
-    
+    a.x = 1.1;
+    a.y = 1.3;
+    b.x = .9;
+    b.y = 1.4;
     std::cout << distance(a,b);
     return 0;
 }
