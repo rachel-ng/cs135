@@ -24,7 +24,7 @@ int countChar(std::string line, char c)
   int result=0;
   for(int i =0; i < line.length();i++)
     {
-      if(line[i]=c)
+      if(line[i]==c)
 	{
 	  result++;
 	}
@@ -44,10 +44,9 @@ std::string unindent()
 }
 std::string indentspacer(std::string input)
 {
-  std::string result = result;
+  std::string result = input;
   static int tracker = 0;
   int numstarts=0; int numends=0;
-
   for(int i =0; i < tracker; i++)
     {
       result = '\t' + input;
@@ -60,13 +59,13 @@ std::string indentspacer(std::string input)
 }
 std::string indent()
 {
-  std::string result;
-  std::string line;
+  std::string result="";
+  std::string line="";
   std::ifstream fin("bad-code.cpp");
   while(getline(fin, line))
     {
       result += indentspacer(line);
       result += '\n';
     }
-  std::cout << result << std::endl;
+  return result;
 }
