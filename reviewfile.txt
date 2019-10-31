@@ -1,0 +1,4 @@
+Partner: Sophia Xia
+
+The functions made are concise and complete the assignment.
+I would recommend testing the function int he main rather than the test file, as you can visibly see the output from main rather than hardcoding the entire test file.
