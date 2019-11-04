@@ -35,9 +35,9 @@ double perimeter(Triangle d) {
     double x = distance(d.a, d.b);
     double y = distance(d.b,d.c);
     double z = distance(d.c,d.a);
-    std::cout << x << std::endl;
-    std::cout << y << std::endl;
-    std::cout << z << std::endl;
+    // std::cout << x << std::endl;
+    // std::cout << y << std::endl;
+    // std::cout << z << std::endl;
     return x + y + z;
 }
 
