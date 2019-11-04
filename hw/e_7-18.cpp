@@ -17,8 +17,11 @@ public:
     double y;
 };
 
-double distance(Point a, Point b) {
-    return pow((pow((b.x - a.x), 2) - pow((b.y - a.y),2)), 0.5);
+double distance (Point a, Point b) {
+    double x = b.x - a.x;
+    double y = b.y - a.y;
+    double z = pow(x,2) + pow(y,2);
+    return pow(z, 0.5);
 }
 
 class Triangle {
@@ -32,9 +35,9 @@ double perimeter(Triangle d) {
     double x = distance(d.a, d.b);
     double y = distance(d.b,d.c);
     double z = distance(d.c,d.a);
-    // std::cout << x << std::endl;
-    // std::cout << y << std::endl;
-    // std::cout << z << std::endl;
+    std::cout << x << std::endl;
+    std::cout << y << std::endl;
+    std::cout << z << std::endl;
     return x + y + z;
 }
 
