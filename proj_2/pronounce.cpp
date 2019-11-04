@@ -10,21 +10,22 @@ Pronunciation dictionary
 
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
-#include <climits>
 
 void upper(char & a){
     int c = a;
     if (c > 96 && c < 123 && c != 39){
+        // get the uppercase letter
         a = (char)c - 32;
     }
 }
 
 bool isalph(char c) {
     if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
+        // if it's a capital or lowercase letter
         return true;
     }
     if (c == 39) {
+        // if it's an apostrophe '
         return true;
     }
     else {
@@ -55,6 +56,7 @@ int countSpaces(std::string s) {
     int spaces = 0;
     for (int i = 0; i < s.length(); i++){
         if (isspace(s[i])) {
+            // if it's a space add it to the count
             spaces += 1;
         }
     }
@@ -63,6 +65,7 @@ int countSpaces(std::string s) {
 
 bool identicalPronun (std::string word, std::string wordpron, std::string dup, std::string duppron) {
     if (wordpron == duppron && word != dup) {
+        // if the pronunciation is the same, and they're different words
         return true;
     }
     else {
@@ -83,17 +86,15 @@ bool checkReplace (std::string word, std::string wordpron, std::string dup, std:
         
         splitOnSpace(wa,wb,wa);
         splitOnSpace(da,db,da);
-        //std::cout << wb << "\t" << db << std::endl;
         if (wb == db) {
+            // count the similarity
             sim ++;
         }
-        //std::cout << i << std::endl;
     }
 
     if (sim == len - 1) {
-        //std::cout << word << "\n" << dup << "\n" << std::endl;
-        //std::cout << wordpron << "\t" << countSpaces(duppron)<< "\n" << duppron << "\t" << countSpaces(duppron)<< "\n" << std::endl;
-        //std::cout << sim << "\n" << len << "\n" << std::endl;
+        // check if the similarity is only missing one
+        // they're the same length, so it should be len - 1
         return true;
     }
     else {
@@ -114,23 +115,23 @@ bool checkAdd (std::string word, std::string wordpron, std::string dup, std::str
          
         splitOnSpace(wa,wb,wa);
         splitOnSpace(da,db,da);
-        //std::cout << wb << "\t" << db << std::endl;
+        
         if (wb == db) {
             sim ++;
         }
         else {
+            // if they're not the same start the string you're checking against with the next phoneme
+            // for an added phoneme
             splitOnSpace(da,db,da);
             if (wb == db) {
                 sim ++;
             }
         }
-        //std::cout << i << std::endl;
     }
 
     if (sim == len) {
-        //std::cout << word << "\n" << dup << "\n" << std::endl;
-        //std::cout << wordpron << "\t" << countSpaces(duppron)<< "\n" << duppron << "\t" << countSpaces(duppron)<< "\n" << std::endl;
-        //std::cout << sim << "\n" << len << "\n" << std::endl;
+        // check if the similarity is the same as the length
+        // one was skipped on the longer pronunciation so it should be the same 
         return true;
     }
     else {
@@ -152,23 +153,23 @@ bool checkRemove (std::string word, std::string wordpron, std::string dup, std::
          
         splitOnSpace(wa,wb,wa);
         splitOnSpace(da,db,da);
-        //std::cout << wb << "\t" << db << std::endl;
+        
         if (wb == db) {
             sim ++;
         }
         else {
+            // if they're not the same start the string you're checking with the next phoneme
+            // for a removed phoneme
             splitOnSpace(wa,wb,wa);
             if (wb == db) {
                 sim ++;
             }
         }
-        //std::cout << i << std::endl;
     }
 
     if (sim == len) {
-        //std::cout << word << "\n" << dup << "\n" << std::endl;
-        //std::cout << wordpron << "\t" << countSpaces(duppron)<< "\n" << duppron << "\t" << countSpaces(duppron)<< "\n" << std::endl;
-        //std::cout << sim << "\n" << len << "\n" << std::endl;
+        // check if the similarity is the same as the length
+        // one was skipped on the longer pronunciation so it should be the same 
         return true;
     }
     else {
@@ -179,20 +180,21 @@ bool checkRemove (std::string word, std::string wordpron, std::string dup, std::
 
 
 int main() {
-
-    std::string input, inputpro, identical, replace, add;
+    std::string input, word, pronun, line, identical, replace, add, remove;
+    std::string inputpro = "Not found";
+    std::string fname = "cmudict.0.7a";
     std::cin >> input;
     
     for (int i = 0; i < input.length(); i++) {
         upper(input[i]);
     }
-
-    std::ifstream fin("cmudict.0.7a.txt");
     
-    std::string line, word, pronun, remove; 
-    
+    std::ifstream fin(fname);
     while(std::getline(fin, line)) {
+        // separates the word from the pronunciation
         splitOnSpace(line, word, pronun);
+        
+        // checks to make sure that all letters are valid (alpha or "'")
         bool val = true;
         for (int i = 0; i < word.length(); i++) {
             int c = word[i];
@@ -202,18 +204,21 @@ int main() {
         }
         if (val && word == input) {
             inputpro = pronun;
-            // std::cout << word << std::endl;
-            std::cout << "\nPronunciation\t: " << pronun << "\n" << std::endl;                
+            std::cout << "\nPronunciation    : " << pronun << "\n" << std::endl;                
         }
     }
-    if (inputpro == "") {
-        std::cout << "Not found" << std::endl;
+    
+    if (inputpro == "Not found") {
+        std::cout << "Not found\n" << std::endl;
     }
     else {
-        std::ifstream fin2("cmudict.0.7a.txt");
+        std::ifstream fin2(fname);
      
         while(std::getline(fin2, line)) {
+            // separates the word from the pronunciation
             splitOnSpace(line, word, pronun);
+            
+            // checks to make sure that all letters are valid (alpha or "'")
             bool val = true;
             for (int i = 0; i < word.length(); i++) {
                 int c = word[i];
@@ -221,6 +226,7 @@ int main() {
                     val = false;
                 }
             } 
+            
             if (val && identicalPronun(input, inputpro, word, pronun)) {
                 // checks if the word is identical
                 identical += word + " ";                
@@ -244,11 +250,11 @@ int main() {
                 }
             }
         }
-        std::cout << "Identical\t: " << identical << std::endl; 
-        std::cout << "Add phoneme\t: " << add << std::endl;
-        std::cout << "Remove phoneme\t: " << remove << std::endl;
-        std::cout << "Replace phoneme\t: " << replace << std::endl;
-        std::cout << std::endl;
+
+        std::cout << "Identical        : " << identical << std::endl; 
+        std::cout << "Add phoneme      : " << add << std::endl;
+        std::cout << "Remove phoneme   : " << remove << std::endl;
+        std::cout << "Replace phoneme  : " << replace << std::endl;
     }
 
     return 0; 
