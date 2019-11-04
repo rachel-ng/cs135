@@ -29,19 +29,25 @@ public:
 };
 
 double perimeter(Triangle d) {
-    return distance(d.a, d.b) + distance(d.b,d.c), distance(d.c,d.a);
+    double x = distance(d.a, d.b);
+    double y = distance(d.b,d.c);
+    double z = distance(d.c,d.a);
+    return x + y + z;
 }
 
 
 int main(){
     Point a, b, c;
-    a.x = 1.1;
-    a.y = 1.3;
-    b.x = .9;
-    b.y = 1.4;
-    c.x = 2.1;
-    c.y = 3.1;
+    a.x = 1;
+    a.y = 3;
+    b.x = 5;
+    b.y = 7;
+    c.x = 2;
+    c.y = 5;
     Triangle d = {a, b, c};
+    std::cout << d.a << std::endl;
+    std::cout << d.b << std::endl;
+    std::cout << d.c << std::endl;
     std::cout << perimeter(d);
     return 0;
 }
