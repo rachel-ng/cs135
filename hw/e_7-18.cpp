@@ -30,24 +30,31 @@ public:
 
 double perimeter(Triangle d) {
     double x = distance(d.a, d.b);
+    std::cout << x << std::endl;
     double y = distance(d.b,d.c);
+    std::cout << y << std::endl;
     double z = distance(d.c,d.a);
+    std::cout << z << std::endl;
     return x + y + z;
 }
 
 
 int main(){
-    Point a, b, c;
-    a.x = 1;
-    a.y = 3;
-    b.x = 5;
-    b.y = 7;
-    c.x = 2;
-    c.y = 5;
+    double f,g,h,i,j,k;
+    std::cin >> f >> g >> h >> i >> j >> k; 
+    Point a = {f, g};
+    Point b = {h, i};
+    Point c = {j, k};
     Triangle d = {a, b, c};
-    std::cout << d.a << std::endl;
-    std::cout << d.b << std::endl;
-    std::cout << d.c << std::endl;
-    std::cout << perimeter(d);
+    std::cout << distance (b, a) << std::endl;
+    std::cout << distance (b, c) << std::endl;
+    std::cout << distance (a, c) << std::endl;
+/*    std::cout << d.a.x << std::endl;
+    std::cout << d.a.y << std::endl;
+    std::cout << d.b.x << std::endl;
+    std::cout << d.b.y << std::endl;
+    std::cout << d.c.x << std::endl;
+    std::cout << d.c.y << std::endl;
+*/    std::cout << perimeter(d);
     return 0;
 }
