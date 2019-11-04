@@ -1,4 +1,4 @@
-/*
+/* 
 Author: Rachel Ng
 Course: CSCI-135
 Instructor: Maryash
@@ -17,16 +17,26 @@ public:
 };
 
 
-double distance(Point a, Point b) {
-    return pow((pow((b.x - a.x), 2) - pow((b.y - a.y),2)), 0.5);
+double distance (Point a, Point b) {
+    double x = b.x - a.x;
+    double y = b.y - a.y;
+    double z = pow(x,2) + pow(y,2);
+    return pow(z, 0.5);
 }
 
 int main(){
     Point a, b;
-    a.x = 1.1;
-    a.y = 1.3;
-    b.x = .9;
-    b.y = 1.4;
-    std::cout << distance(a,b);
+    std::cout << "Point a" << std::endl;
+    std::cout << "x: " ;
+    std::cin >> a.x;
+    std::cout << "y: " ;
+    std::cin >> a.y;
+    std::cout << "Point b" << std::endl;
+    std::cout << "x: " ;
+    std::cin >> b.x;
+    std::cout << "y: " ;
+    std::cin >> b.y;
+    
+    std::cout << distance(a,b) << std::endl;
     return 0;
 }
