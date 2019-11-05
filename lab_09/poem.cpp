@@ -4,25 +4,27 @@ Course: CSCI-135
 Instructor: Zamansky
 Assignment: Lab 9
 
-Coord3D, length, fartherFromOrigin, move
+Poem assignment 
 */
 
 #include <iostream>
 
-std::string * createAPoemDynamically() {
-    std::string *p = new std::string;
+using namespace std;
+
+string * createAPoemDynamically() {
+    string *p = new string;
     *p = "Roses are red, violets are blue";
     return p;
 }
 
 int main() {
     while(true) {
-        std::string *p;
+        string *p;
         p = createAPoemDynamically();
-        
-        // assume that the poem p is not needed at this point
 
-        delete p; 
+        // assume that the poem p is not needed at this point
+        
+        delete p;
     }
 }
 
