@@ -34,6 +34,16 @@ void move(Coord3D *ppos, Coord3D *pvel, double dt) {
     (*ppos).z = (*ppos).z + (*pvel).z * dt;
 }
 
+Coord3D* createCoord3D(double x, double y, double z) {
+    Coord3D *a = new Coord3D;
+    *a = {x, y, z};
+    return a;
+}
+
+void deleteCoord3D(Coord3D *p) {
+    delete p;
+}
+
 int main() {
     
     Coord3D pointP = {10, 20, 30};
@@ -58,6 +68,23 @@ int main() {
     move(&pos, &vel, 2.0); // object pos gets changed
     std::cout << pos.x << " " << pos.y << " " << pos.z << std::endl;
     // prints: 2 -10 100.4
+
+    double x, y, z;
+    std::cout << "Enter position: ";
+    std::cin >> x >> y >> z;
+    Coord3D *ppos = createCoord3D(x,y,z);
+    
+    std::cout << "Enter velocity: ";
+    std::cin >> x >> y >> z;
+    Coord3D *pvel = createCoord3D(x,y,z);
+
+    move(ppos, pvel, 10.0);
+
+    std::cout << "Coordinates after 10 seconds: " 
+         << (*ppos).x << " " << (*ppos).y << " " << (*ppos).z << std::endl;
+
+    deleteCoord3D(ppos); // release memory
+    deleteCoord3D(pvel);
 
     return 0;
 }
