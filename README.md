@@ -8,3 +8,24 @@
 g++ -o e [filename]
 ```
 
+```
+/*
+Author: Rachel Ng
+Course: CSCI-136
+Instructor: Zamansky
+Assignment: Lab N
+
+[lab desc]
+*/
+```
+
+```
+/*
+Author: Rachel Ng
+Course: CSCI-135
+Instructor: Maryash
+Assignment: E
+
+[hw desc]
+*/
+```
