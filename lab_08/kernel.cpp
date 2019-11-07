@@ -106,14 +106,20 @@ int main() {
             for (int i = 0; i < 8; i++) {
                 int rn = row + NEIGHBORS[i][0];
                 int cn = col + NEIGHBORS[i][1];
-                if (rn < 0 || rn > h - 1 || cn < 0 || cn > h - 1) {
+                if (rn < 0 || rn > h - 1 || cn < 0 || cn > w - 1) {
                     neighborhood[i] = 0;
                 }
                 else {
                     neighborhood[i] = img[rn][cn];
                 }
             }
-            int a = (neighborhood[5] + (2 * neighborhood[6]) +  neighborhood[7]) - (neighborhood[0] + (2 * neighborhood[2]) + neighborhood[3]);
+            int a = (neighborhood[5] + (2 * neighborhood[6]) +  neighborhood[7]) - (neighborhood[0] + (2 * neighborhood[1]) + neighborhood[2]);
+            if (a < 0) {
+                a = 0;
+            }
+            if (a > 255) {
+                a = 255;
+            }
             out[row][col] = a;
         }
 	}
