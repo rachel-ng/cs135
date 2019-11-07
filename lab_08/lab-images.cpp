@@ -27,9 +27,10 @@ void readImage(int image[MAX_H][MAX_W], int &height, int &width) {
 
 	// read the header P2
 	instr >> c;
-	assert(c == 'P');
+	cout << c;
+    //assert(c == 'P');
 	instr >> c;
-	assert(c == '2');
+	//assert(c == '2');
 
 	// skip the comments (if any)
 	while ((instr>>ws).peek() == '#') {
@@ -43,7 +44,7 @@ void readImage(int image[MAX_H][MAX_W], int &height, int &width) {
 	assert(height <= MAX_H);
 	int max;
 	instr >> max;
-	assert(max == 255);
+	//assert(max == 255);
 
 	for (int row = 0; row < height; row++)
 		for (int col = 0; col < width; col++)
