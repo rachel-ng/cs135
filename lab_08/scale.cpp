@@ -1,8 +1,5 @@
 /*
-Author: Rachel Ng
-Course: CSCI-136
-Instructor: Zamansky
-Assignment: Lab 8
+  Author:   <---  Write your name here
 
   Description:
     The program reads a PGM image from the file "inImage.pgm",
@@ -97,18 +94,18 @@ int main() {
 
 	// Now we can manipulate the image the way we like
 	// for example we copy its contents into a new array
-	//int out[MAX_H][MAX_W];
-    
+	int out[MAX_H][MAX_W];
+
 	for(int row = 0; row < h; row++) {
 		for(int col = 0; col < w; col++) {
-            out[row][col] = img[row][col];
-            out[row * 2 + 1][col] = img[row][col];
-            out[row][col] = img[row][col];
-            out[row][col * 2 +1] = img[row][col];
-        }
+            out[row * 2][col * 2] = img[row][col];
+            out[row * 2][col * 2 + 1] = img[row][col];
+            out[row * 2 + 1][col * 2] = img[row][col];
+            out[row * 2 + 1][col * 2 + 1] = img[row][col];
+		}
 	}
 
 	// and save this new image to file "outImage.pgm"
-    writeImage(out, h, w);
+	writeImage(out, h * 2, w * 2);
 
 }
