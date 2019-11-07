@@ -106,4 +106,3 @@ int main() {
 	writeImage(out, h, w);
 
 }
-
