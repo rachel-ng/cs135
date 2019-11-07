@@ -19,7 +19,7 @@ using namespace std;
 
 const int MAX_H = 512;
 const int MAX_W = 512;
-const int NEIGHBORS[8][2] = {{-1,-1}, {-1,0}, {-1,1}, {0,-1}, {0,1}, {1,-1}, {1,0}, {1,1}};
+int NEIGHBORS[8][2] = {{-1,-1}, {-1,0}, {-1,1}, {0,-1}, {0,1}, {1,-1}, {1,0}, {1,1}};
 
 // Reads a PGM file.
 // Notice that: height and width are passed by reference!
@@ -102,20 +102,19 @@ int main() {
 
 	for(int row = 0; row < h; row++) {
 		for(int col = 0; col < w; col++) {
-                int neighborhood[8];
-                for (int i = 0; i < 8; i++) {
-                    int rn = row + NEIGHBORS[i][0];
-                    int cn = col + NEIGHBORS[i][1];
-                    if (rn < 0 || rn > h - 1 || cn < 0 || cn > h - 1) {
-                        neighborhood[i] = 0;
-                    }
-                    else {
-                        neighborhood[i] = img[rn][cn];
-                    }
+		    int neighborhood[8];
+            for (int i = 0; i < 8; i++) {
+                int rn = row + NEIGHBORS[i][0];
+                int cn = col + NEIGHBORS[i][1];
+                if (rn < 0 || rn > h - 1 || cn < 0 || cn > h - 1) {
+                    neighborhood[i] = 0;
                 }
-                int a = (neighborhood[5] + (2 * neighborhood[6]) +  neighborhood[7]) - (neighborhood[0] + (2 * neighborhood[2]) + neighborhood[3]);
-                out[row][col] = a;
+                else {
+                    neighborhood[i] = img[rn][cn];
+                }
             }
+            int a = (neighborhood[5] + (2 * neighborhood[6]) +  neighborhood[7]) - (neighborhood[0] + (2 * neighborhood[2]) + neighborhood[3]);
+            out[row][col] = a;
         }
 	}
 
