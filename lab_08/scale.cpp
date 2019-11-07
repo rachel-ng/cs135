@@ -1,5 +1,8 @@
 /*
-  Author:   <---  Write your name here
+Author: Rachel Ng
+Course: CSCI-136
+Instructor: Zamansky
+Assignment: Lab 8
 
   Description:
     The program reads a PGM image from the file "inImage.pgm",
