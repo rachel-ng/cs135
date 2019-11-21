@@ -8,13 +8,18 @@
 using namespace std;
 
 const int MAX_ROBOT_NUM = 50;
-const int NEIGHBORS[8][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1}};
-const int ADJACENT[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
 int NUM;          // to remember number or robots
 int ROWS, COLS;   // map dimensions
+
+const int NEIGHBORS[8][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1}};
+const int ADJACENT[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
+
 vector<Loc> LOCATIONS;  
 vector<Loc> BROKEN_LOC;  
 std::vector<int> FIXERS;
+std::vector<std::vector<int>> TREAD(ROWS, std::vector<int>(COLS, 0));
+
+
 
 /* Initialization procedure, called when the game starts: */
 void onStart(int num, int rows, int cols, double mpr,
@@ -39,52 +44,50 @@ double manhattanDist(Loc start, Loc target) {
 Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 	int row = loc.r; // current row and column
 	int col = loc.c;
-	LOCATIONS[id] = loc;
+	
+    LOCATIONS[id] = loc;
+    TREAD[row][col] += 1;
+
     if (area.inspect(row, col) == DEBRIS) {
 		return COLLECT;
 	}
     else if (FIXERS[id] != -1) {
-        int target = FIXERS[id];
-        int target_r = BROKEN_LOC[target].r;
-        int target_c = BROKEN_LOC[target].c;
-        int next_r = row;
-        int next_c = col;
-        int pref_r = target_r < next_r ? -1 : 1;
-        int pref_c = target_c < next_c ? -1 : 1;
-        pref_r = target_r == next_r ? 0 : pref_r;
-        pref_c = target_c == next_c ? 0 : pref_c;
+        int target_r = BROKEN_LOC[FIXERS[id]].r;
+        int target_c = BROKEN_LOC[FIXERS[id]].c;
+        int pref_r = target_r < row ? -1 : 1;
+        int pref_c = target_c < col ? -1 : 1;
+        pref_r = target_r == row ? 0 : pref_r;
+        pref_c = target_c == col ? 0 : pref_c;
 
-        for (int i = 0; i < 4; i++) {
-            next_r = row + ADJACENT[i][0];
-            next_c = col + ADJACENT[i][1];
-            next_loc = {next_r, next_c};
-            if(area.inspect(next_r, next_c) == DEBRIS && (next_r - row == pref_r || next_c - col == pref_c)) {
-                switch(i) {
-                case 0:
-                    return UP;
-                case 1:
-                    return LEFT;
-                case 2:
-                    return RIGHT;
-                default:
-                    return DOWN;
-                } 
-            }
+        if (target_r == row && abs(target_c-col) == 1) {
+            FIXERS[id] = -1;
+            return pref_c == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
+        }
+        if (target_c == col && abs(target_r-row) == 1) {
+            FIXERS[id] = -1;
+            return pref_r == -1 ? REPAIR_UP : REPAIR_DOWN; 
+        }
+
+        if (area.inspect(row + pref_r, col) == DEBRIS) {
+            return pref_r == -1 ? UP : DOWN;
+        }
+        if (area.inspect(row, col + pref_c) == DEBRIS) {
+            return pref_c == -1 ? LEFT : RIGHT;
+        }
+
+        if (pref_r == 0) {
+            return pref_c == -1 ? LEFT : RIGHT;
+        }
+        if (pref_c == 0) {
+            return pref_r == -1 ? UP : DOWN;
         }
         
         switch(rand() % 1) {
 		case 0:
-            switch(rand() % 2) {
-            case 0:
-                return LEFT;
-            case 1:
-                return RIGHT;
-            }
-        case 1:
-			return RIGHT;
+            return pref_r == -1 ? UP : DOWN;
+        default:
+            return pref_c == -1 ? LEFT : RIGHT;
 		}
-
-        
     }
     else {
         for (int i = 0; i < 8; i++) {
@@ -139,7 +142,7 @@ void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
         }
     }
     FIXERS[fix] = id;
-	log << "Robot " << fix << "to fix" << FIXERS[fix]<< endl;
+	log << "Robot " << fix << " to fix " << FIXERS[fix]<< endl;
 }
 
 void onClockTick(int time, ostream &log) {
