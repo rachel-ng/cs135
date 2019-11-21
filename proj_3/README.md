@@ -10,7 +10,7 @@
 ./test.rb ./mission
 ```
 
-## 11/21/19 13:00 Kernel
+### 11/21/19 13:00 Kernel
 ```
 Average collection rate:
 	all	   345 	 -> 	(Score 29.4)
@@ -37,7 +37,7 @@ cols:
 	35	   251 
 ```
 
-## 11/21/19 16:20 Repair bots 
+### 11/21/19 16:20 Repair bots 
 ```
 Average collection rate:
 	all	   427 	 -> 	(Score 36.3)
@@ -64,7 +64,7 @@ cols:
 	35	   326 
 ```
 
-## 11/21/19 16:20 Further neighbors
+### 11/21/19 16:20 Further neighbors
 ```
 Average collection rate:
 	all	   468 	 -> 	(Score 39.8)
