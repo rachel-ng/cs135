@@ -1,4 +1,14 @@
+# [project 3](https://maryash.github.io/135/projects/project_03.html)
+
+```
+./mission rows cols num debris mpr
+./mission 25 30 10  0.5  0.0001  12345 
+./mission 25 30 10  0.5
+```
+
+```
 ./test.rb ./mission
+```
 
 ## 11/21/19 13:00 Kernel
 ```
