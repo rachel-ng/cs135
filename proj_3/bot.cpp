@@ -11,7 +11,8 @@ const int MAX_ROBOT_NUM = 50;
 int NUM;          // to remember number or robots
 int ROWS, COLS;   // map dimensions
 
-const int NEIGHBORS[8][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1}};
+//const int NEIGHBORS[8][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1}};
+const int NEIGHBORS[12][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1},{-2,0},{0,-2},{0,2},{2,0}};
 const int ADJACENT[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
 
 vector<Loc> LOCATIONS;  
@@ -46,7 +47,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 	int col = loc.c;
 	
     LOCATIONS[id] = loc;
-    TREAD[row][col] += 1;
+    //TREAD[row][col] = TREAD[row][col] + 1;
 
     if (area.inspect(row, col) == DEBRIS) {
 		return COLLECT;
@@ -90,7 +91,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		}
     }
     else {
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 12; i++) {
             if(area.inspect(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == DEBRIS) {
                 switch(i) {
                 case 0:
@@ -107,6 +108,14 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                     return UP;
                 case 6:
                     return DOWN;
+                case 7:
+                    return DOWN;
+                case 8:
+                    return UP;
+                case 9:
+                    return LEFT;
+                case 10:
+                    return RIGHT;
                 default:
                     return DOWN;
                 }
@@ -114,7 +123,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         }
 
         // if not at a debris field, move randomly:
-		switch(rand() % 4) {
+	    	
+        switch(rand() % 4) {
 		case 0:
 			return LEFT;
 		case 1:
@@ -128,8 +138,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 }
 
 void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
-	log << "Robot " << id << " is damaged." << endl;
-	log << "Location: " << loc.r << ", " << loc.c << endl;
+	log << "Robot " << id << " is damaged (" << loc.r << ", " << loc.c << ")" << endl;
     BROKEN_LOC[id] = loc;
     int min = ROWS * COLS;
     int fix = -1;
