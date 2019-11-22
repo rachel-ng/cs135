@@ -18,9 +18,7 @@ const int ADJACENT[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
 vector<Loc> LOCATIONS;  
 vector<Loc> BROKEN_LOC;  
 std::vector<int> FIXERS;
-std::vector<std::vector<int>> TREAD(ROWS, std::vector<int>(COLS, 0));
-
-
+std::vector<std::vector<int>> TREAD;
 
 /* Initialization procedure, called when the game starts: */
 void onStart(int num, int rows, int cols, double mpr,
@@ -29,13 +27,13 @@ void onStart(int num, int rows, int cols, double mpr,
 	NUM = num;   // save the number of robots and the map dimensions
 	ROWS = rows;
 	COLS = cols;
-	
     LOCATIONS.resize(NUM);
     BROKEN_LOC.resize(NUM);
     FIXERS.resize(NUM, -1);
-
+    TREAD.resize(ROWS, std::vector<int>(COLS, 0));
     log << "Start!" << endl;
 }
+
 
 double manhattanDist(Loc start, Loc target) {
     return abs(start.c-target.c) + abs(start.r-target.r);
@@ -47,7 +45,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 	int col = loc.c;
 	
     LOCATIONS[id] = loc;
-    //TREAD[row][col] = TREAD[row][col] + 1;
+    TREAD[row][col] += 1;
 
     if (area.inspect(row, col) == DEBRIS) {
 		return COLLECT;
@@ -94,45 +92,37 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         for (int i = 0; i < 12; i++) {
             if(area.inspect(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == DEBRIS) {
                 switch(i) {
-                case 0:
-                    return UP;
-                case 1:
-                    return LEFT;
-                case 2:
-                    return RIGHT;
-                case 3:
-                    return DOWN;
-                case 4:
-                    return UP;
-                case 5:
-                    return UP;
-                case 6:
-                    return DOWN;
-                case 7:
-                    return DOWN;
-                case 8:
-                    return UP;
-                case 9:
-                    return LEFT;
-                case 10:
-                    return RIGHT;
-                default:
-                    return DOWN;
+                case 0: return UP;
+                case 1: return LEFT;
+                case 2: return RIGHT;
+                case 3: return DOWN;
+                case 4: return UP;
+                case 5: return UP;
+                case 6: return DOWN;
+                case 7: return DOWN;
+                case 8: return UP;
+                case 9: return LEFT;
+                case 10: return RIGHT;
+                default: return DOWN;
                 }
+            }
+        }
+        
+        int best = -1;
+        int bestv = ROWS * COLS;
+        for (int i = 0; i < 4; i++) {
+            if (row + ADJACENT[i][0] > -1 && row + ADJACENT[i][0] < ROWS && col + ADJACENT[i][1] > -1 && col + ADJACENT[i][1] < COLS) {
+                best = TREAD[row + ADJACENT[i][0]][col + ADJACENT[i][1]] < bestv ? i : best;
+                bestv = TREAD[row + ADJACENT[i][0]][col + ADJACENT[i][1]] < bestv ? TREAD[row + ADJACENT[i][0]][col + ADJACENT[i][1]] : bestv;
             }
         }
 
         // if not at a debris field, move randomly:
-	    	
         switch(rand() % 4) {
-		case 0:
-			return LEFT;
-		case 1:
-			return RIGHT;
-		case 2:
-			return UP;
-		default:
-			return DOWN;
+		case 0: return LEFT;
+		case 1: return RIGHT;
+		case 2: return UP;
+		default: return DOWN;
 		}
 	}
 }
