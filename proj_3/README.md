@@ -1,8 +1,5 @@
 # [project 3](https://maryash.github.io/135/projects/project_03.html)
 
-## Do Not Repeat
-- avoid previous location
-
 ```
 ./mission rows cols num debris mpr
 ./mission 25 30 10  0.5  0.0001  12345 
@@ -203,3 +200,7 @@ cols:
 	15	   728 
 	35	   514 
 ```
+
+## Do Not Repeat
+- avoid previous location
+- bounding from all sides... kinda weird but I'll take it
