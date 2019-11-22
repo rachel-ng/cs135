@@ -119,7 +119,7 @@ cols:
 	35	   365 
 ```
 
-## 11/21/19 19:00 ~Least "treaded" debris field~ Further neighbors
+### 11/21/19 19:00 ~Least "treaded" debris field~ Further neighbors
 ```
 Average collection rate:
 	all	   500 	 -> 	(Score 42.6)
@@ -147,7 +147,7 @@ cols:
 ```
 
 
-## 11/21/19 19:20 Least "treaded" debris field
+### 11/21/19 19:20 Least "treaded" debris field
 ```
 Average collection rate:
 	all	   528 	 -> 	(Score 44.9)
@@ -174,7 +174,7 @@ cols:
 	35	   444 
 ```
 
-## 11/22/19 2:40 Bounding
+### 11/22/19 2:40 Bounding
 ```
 Average collection rate:
 	all	   655 	 -> 	(Score 55.7)
