@@ -11,6 +11,7 @@
 
 ```
 ./test.rb ./mission
+time ./test.rb ./mission
 ```
 
 ### Original 

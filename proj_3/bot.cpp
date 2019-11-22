@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector> 
-#include <algorithm>
+#include <cmath>
 #include "bot.h"
 
 using namespace std;
@@ -11,6 +11,7 @@ const int MAX_ROBOT_NUM = 50;
 int NUM;          // to remember number or robots
 int ROWS, COLS;   // map dimensions
 
+int SECTORS;
 //const int NEIGHBORS[8][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1}};
 const int NEIGHBORS[12][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1},{-2,0},{0,-2},{0,2},{2,0}};
 const int ADJACENT[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
@@ -19,6 +20,7 @@ vector<Loc> LOCATIONS;
 vector<Loc> BROKEN_LOC;  
 std::vector<int> FIXERS;
 std::vector<std::vector<int>> TREAD;
+std::vector<std::vector<int>> DEAD;
 
 /* Initialization procedure, called when the game starts: */
 void onStart(int num, int rows, int cols, double mpr,
@@ -27,16 +29,32 @@ void onStart(int num, int rows, int cols, double mpr,
 	NUM = num;   // save the number of robots and the map dimensions
 	ROWS = rows;
 	COLS = cols;
+    SECTORS = 4;
     LOCATIONS.resize(NUM);
     BROKEN_LOC.resize(NUM);
     FIXERS.resize(NUM, -1);
     TREAD.resize(ROWS, std::vector<int>(COLS, 0));
+    DEAD.resize(ROWS, std::vector<int>(COLS, 0));
     log << "Start!" << endl;
 }
 
 
 double manhattanDist(Loc start, Loc target) {
     return abs(start.c-target.c) + abs(start.r-target.r);
+}
+
+double coverage(int sector) {
+    double sum = 0.0;
+    int width = COLS / (SECTORS / 2);
+    int height = ROWS / (SECTORS / 2);
+    for (int r = 0; r < height; r++) {
+        for (int c = 0; c < width; c++) {
+            sum += TREAD[(height * floor(sector / 2)) + r][(width * (sector % 2)) + c] > 0 ? 1 : 0;
+            sum += DEAD[(height * floor(sector / 2)) + r][(width * (sector % 2)) + c] > 0 ? 1 : 0;
+            sum -= (TREAD[(height * floor(sector / 2)) + r][(width * (sector % 2)) + c] > 0 && DEAD[(height * floor(sector / 2)) + r][(width * (sector % 2)) + c] > 0) ? 1 : 0; 
+        }
+    }
+    return sum / (width * height);
 }
 
 /* Deciding robot's next move */
@@ -106,6 +124,9 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 default: return DOWN;
                 }
             }
+            else if (row + NEIGHBORS[i][0] > -1 && row + NEIGHBORS[i][0] < ROWS && col + NEIGHBORS[i][1] > -1 && col + NEIGHBORS[i][1] < COLS) {
+                DEAD[row + NEIGHBORS[i][0]][col + NEIGHBORS[i][1]] += 1;
+            }
         }
         
         int best = -1;
@@ -145,7 +166,12 @@ void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
 }
 
 void onClockTick(int time, ostream &log) {
-	if (time % 100 == 0) log << time << " ";
+	if (time % 100 == 0) {
+        log << time << " " << endl;
+        for (int i = 0; i < SECTORS; i++) {
+            log << i << "\t" << coverage(i) << "\t" << ((COLS / (SECTORS / 2)) * floor(i / 2)) << ", " << ((ROWS / (SECTORS / 2)) * (i%2)) << endl;
+        }
+    }
 }
 
 
