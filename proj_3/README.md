@@ -10,6 +10,33 @@
 ./test.rb ./mission
 ```
 
+### Original 
+```
+Average collection rate:
+	all	   189 	 -> 	(Score 16.1)
+mpr:
+	0.0	   190
+	0.0002	   218
+	0.005	   193
+	0.02	   184
+	0.4	   159
+debris:
+	0.2	     0
+	0.5	     0
+	0.8	  1105
+num:
+	2	   131
+	5	   138
+	15	   186
+	30	   302
+rows:
+	15	   233
+	35	   145
+cols:
+	15	   233
+	35	   145
+```
+
 ### 11/21/19 13:00 Kernel
 ```
 Average collection rate:
