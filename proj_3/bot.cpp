@@ -118,10 +118,10 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         }
 
         // if not at a debris field, move randomly:
-        switch(rand() % 4) {
-		case 0: return LEFT;
-		case 1: return RIGHT;
-		case 2: return UP;
+        switch(best) {
+		case 0: return UP;
+		case 1: return LEFT;
+		case 2: return RIGHT;
 		default: return DOWN;
 		}
 	}
