@@ -78,7 +78,8 @@ void onStart(int num, int rows, int cols, double mpr,
     log << "Start!" << endl;
 }
 void bounds(Area &area) {
-    //bool all_ded_c = true;
+    std::vector<bool> all_ded_c;
+    all_ded_c.resize(COLS, true);
     for (int r = BOUND_R; r < ROWS; r++) {
         bool all_ded_r = true;
         for (int c = 0; c < COLS; c++) {
@@ -86,11 +87,16 @@ void bounds(Area &area) {
             int d = DEAD[r][c] > 0 ? 1 : 0; 
             int a = (t == 0 && d == 0) ? ((area.inspect(r,c) != DEBRIS) ? 1 : 0) : 1;
             all_ded_r = (t > 0 && d > 0 && a > 0) ? all_ded_r : false;
-            //all_ded_c = (c == BOUND_C + 1) ? ((t > 0 && d > 0 && a > 0) ? all_ded_c : false) : all_ded_c;
+            all_ded_c[c] = (t > 0 && d > 0 && a > 0) ? all_ded_c[c] : false;
         }
         BOUND_R = (all_ded_r && r == BOUND_R + 1) ? r : BOUND_R; 
     }
-    //BOUND_C = (all_ded_c) ? BOUND_C + 1 : BOUND_C; 
+    for (int i = BOUND_C + 1; i < COLS; i++) {
+        if (!all_ded_c[i]) {
+            BOUND_C = i - 1;
+            break;
+        }
+    }
 }
 double coverage(Area &area, int sector) {
     double sum = 0.0;
@@ -192,6 +198,10 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             else if (row+ADJC[i][0] < BOUND_R) {
                 return DOWN;
             }
+            else if (row+ADJC[i][1] < BOUND_C) {
+                return RIGHT;
+            }
+
         }
 
         switch(best) {
