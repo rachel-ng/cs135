@@ -231,28 +231,28 @@ cols:
 ### 11/27/19 5:00 Bounding (More efficient + better, got rid of a lot of junk + time / efficiency wasters)
 ```
 Average collection rate:
-	all	   862 	 -> 	(Score 73.3)
+	all	   871 	 -> 	(Score 74.1)
 mpr:
-	0.0	  1063 
-	0.0002	  1060 
-	0.005	  1011 
-	0.02	   886 
-	0.4	   289 
+	0.0	  1072 
+	0.0002	  1004 
+	0.005	  1025 
+	0.02	   948 
+	0.4	   307 
 debris:
-	0.2	   266 
-	0.5	   851 
-	0.8	  1468 
+	0.2	   249 
+	0.5	   888 
+	0.8	  1475 
 num:
-	2	  1075 
-	5	   936 
-	15	   790 
-	30	   646 
+	2	  1090 
+	5	   983 
+	15	   757 
+	30	   653 
 rows:
-	15	   891 
-	35	   833 
+	15	   933 
+	35	   809 
 cols:
-	15	   903 
-	35	   821 
+	15	   919 
+	35	   823
 ```
 
 ## Do Not Repeat
