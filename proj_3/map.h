@@ -15,6 +15,8 @@ class Map {
     int NUM;
     int BOUND_R = 0;
     int BOUND_C = 0;
+    int BOUND_RB;
+    int BOUND_CB;
     int cleared = 0;
     int piles; 
     std::vector<std::vector<int>> TREAD;
@@ -35,8 +37,12 @@ public:
     void bound();
     void bound_r();
     void bound_c();
+    void bound_rb();
+    void bound_cb();
     int b_r();
     int b_c();
+    int b_rb();
+    int b_cb();
 };
 
 #endif

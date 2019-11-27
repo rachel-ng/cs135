@@ -6,6 +6,8 @@ Map::Map (int row, int col, int num) {
     ROWS = row;
     COLS = col;
     NUM = num;
+    BOUND_CB  = COLS;
+    BOUND_RB = ROWS;
     piles = ROWS * COLS;
     robots.resize(NUM);
     fields.resize(ROWS, std::vector<Places>(COLS,UNDEF));
@@ -15,7 +17,7 @@ Map::Map (int row, int col, int num) {
 }
 
 bool Map::in_range (Loc loc) {
-  return (loc.r >= BOUND_R && loc.c >= BOUND_C && loc.r < ROWS && loc.c < COLS);
+  return (loc.r >= BOUND_R && loc.c >= BOUND_C && loc.r < BOUND_RB && loc.c < BOUND_CB);
 }
 
 Places Map::peek (int row, int col) {
@@ -57,16 +59,21 @@ bool Map::update (Loc loc, Places p) {
             TREAD[loc.r][loc.c] += 1;
         }
         
-        if(loc.r > BOUND_R) {
-            bound_r(); 
-        }
-        if(loc.c > BOUND_C) {
-            bound_c();
-        }
-        if (loc.r <= BOUND_R || loc.c <= BOUND_C) { 
+        if (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB) { 
             TREAD[loc.r][loc.c] += 1;
+            return true;
+        }
+        
+        if(loc.r > BOUND_R || loc.r <= BOUND_RB) {
+            bound_r(); 
+            bound_rb(); 
         }
 
+        if(loc.c > BOUND_C || loc.c <= BOUND_CB) {
+            bound_c();
+            bound_cb();
+        }
+        
         return true;
     }
     return false;
@@ -100,15 +107,22 @@ bool Map::update (Loc loc, Places p, int id) {
             TREAD[loc.r][loc.c] += 1;
             DEAD[loc.r][loc.c] += 1;
         }
-        if(loc.r > BOUND_R) {
-            bound_r(); 
-        }
-        if(loc.c > BOUND_C) {
-            bound_c();
-        }
-        if (loc.r <= BOUND_R || loc.c <= BOUND_C) { 
+        
+        if (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB) { 
             TREAD[loc.r][loc.c] += 1;
+            return true;
         }
+
+        if(loc.r > BOUND_R || loc.r <= BOUND_RB) {
+            bound_r(); 
+            bound_rb(); 
+        }
+
+        if(loc.c > BOUND_C || loc.c <= BOUND_CB) {
+            bound_c();
+            bound_cb();
+        }
+        
         return true;
     }
     return false;
@@ -135,8 +149,8 @@ int Map::pile () {
 
 void Map::bound_r() {
     bool rip = true;
-    for (int i = BOUND_R; i < ROWS; i++) {
-        for (int c = BOUND_C; c < COLS; c++) {
+    for (int i = BOUND_R; i < BOUND_RB; i++) {
+        for (int c = BOUND_C; c < BOUND_CB; c++) {
             if (!covered[i][c]) {
                 rip = false;
                 break;
@@ -153,43 +167,7 @@ void Map::bound_r() {
 
 void Map::bound_c() {
     bool rip = true;
-    for (int i = BOUND_C; i < COLS; i++) {
-        for (int r = BOUND_R; r < ROWS; r++) {
-            if (!covered[r][i]) {
-                rip = false;
-                break;
-            }
-        }
-        if (rip) {
-            BOUND_C = i;
-        }
-        else {
-            break;
-        }
-    }
-}
-/*
-void Map::bound_rb() {
-    for (int i = BOUND_R; i < ROWS; i++) {
-        bool rip = true;
-        for (int c = BOUND_C; c < COLS; c++) {
-            if (!covered[i][c]) {
-                rip = false;
-                break;
-            }
-        }
-        if (rip) {
-            BOUND_R = i;
-        }
-        else {
-            break;
-        }
-    }
-}
-
-void Map::bound_cb() {
-    for (int i = BOUND_CB; i > BOUND_C; i++) {
-        bool rip = true;
+    for (int i = BOUND_C; i < BOUND_CB; i++) {
         for (int r = BOUND_R; r < BOUND_RB; r++) {
             if (!covered[r][i]) {
                 rip = false;
@@ -203,7 +181,43 @@ void Map::bound_cb() {
             break;
         }
     }
-}*/
+}
+
+void Map::bound_rb() {
+    for (int i = BOUND_RB-1; i >= BOUND_R; i--) {
+        bool rip = true;
+        for (int c = BOUND_C; c < BOUND_CB; c++) {
+            if (!covered[i][c]) {
+                rip = false;
+                break;
+            }
+        }
+        if (rip) {
+            BOUND_RB = i;
+        }
+        else {
+            break;
+        }
+    }
+}
+
+void Map::bound_cb() {
+    for (int i = BOUND_CB-1; i >= BOUND_C; i--) {
+        bool rip = true;
+        for (int r = BOUND_R; r < BOUND_RB; r++) {
+            if (!covered[r][i]) {
+                rip = false;
+                break;
+            }
+        }
+        if (rip) {
+            BOUND_CB = i;
+        }
+        else {
+            break;
+        }
+    }
+}
 
 int Map::b_r() {
     return BOUND_R;
@@ -213,3 +227,10 @@ int Map::b_c() {
     return BOUND_C;
 }
 
+int Map::b_rb() {
+    return BOUND_RB;
+}
+
+int Map::b_cb() {
+    return BOUND_CB;
+}

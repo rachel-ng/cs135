@@ -148,11 +148,18 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             map.update({row+1,col},ROBOT,id);
             return DOWN;
         }
+        if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col})) {
+            map.update({row-1,col},ROBOT,id);
+            return UP;
+        }
         if (col <= map.b_c() && map.in_range({row,map.b_c() + 1})) {
             map.update({row,col+1},ROBOT,id);
             return RIGHT;
         }
-        
+        if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1})) {
+            map.update({row,col-1},ROBOT,id);
+            return LEFT;
+        }
         int best = -1;
         int bestv = ROWS * COLS;
         for (int i = 0; i < 4; i++) {
@@ -160,17 +167,21 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 best = map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? i : best;
                 bestv =  map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? map.tread({row + ADJC[i][0],col + ADJC[i][1]}) : bestv;
             }
-            else if (row+ADJC[i][0] < map.b_r()-1) {
+            else if (row+ADJC[i][0] <= map.b_r()-1) {
                 map.update({row+1,col},ROBOT,id);
                 return DOWN;
             }
-            else if (row+ADJC[i][0] == map.b_r() - 1) {
+            else if (row+ADJC[i][0] >= map.b_rb()+1) {
                 map.update({row-1,col},ROBOT,id);
                 return UP;
             }
-            else if (col+ADJC[i][1] < map.b_c()-1) {
+            else if (col+ADJC[i][1] <= map.b_c()-1) {
                 map.update({row,col+1},ROBOT,id);
                 return RIGHT;
+            }
+            else if (col+ADJC[i][1] >= map.b_cb()+1) {
+                map.update({row,col-1},ROBOT,id);
+                return LEFT;
             }
         }
 
@@ -207,7 +218,7 @@ void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
 
 void onClockTick(int time, ostream &log) {
 	if (time % 100 == 0) {
-        log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << "\t" <<  map.clear() << " / " << map.pile() << "\t" << NUM << endl;
+        log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << map.b_rb() << ", " << map.b_cb()<< "\t" <<  map.clear() << " / " << map.pile() << "\t" << NUM << endl;
     }
 }
 
