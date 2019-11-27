@@ -228,6 +228,33 @@ cols:
 	35	   619
 ```
 
+### 11/27/19 5:00 Bounding (More efficient + better, got rid of a lot of junk + time / efficiency wasters)
+```
+Average collection rate:
+	all	   862 	 -> 	(Score 73.3)
+mpr:
+	0.0	  1063 
+	0.0002	  1060 
+	0.005	  1011 
+	0.02	   886 
+	0.4	   289 
+debris:
+	0.2	   266 
+	0.5	   851 
+	0.8	  1468 
+num:
+	2	  1075 
+	5	   936 
+	15	   790 
+	30	   646 
+rows:
+	15	   891 
+	35	   833 
+cols:
+	15	   903 
+	35	   821 
+```
+
 ## Do Not Repeat
 - avoid previous location
 - bounding from all sides... kinda weird but I'll take it

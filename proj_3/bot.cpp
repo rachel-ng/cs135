@@ -14,16 +14,11 @@ int ROWS, COLS;
 
 Map map = Map(0,0,MAX_ROBOT_NUM); 
 
-int BOUND_R = 0;
-int BOUND_C = 0;
-
 const int NEIGHBORS[12][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1},{-2,0},{0,-2},{0,2},{2,0}};
 const int ADJC[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
 
 vector<Loc> BROKEN_LOC;  
 std::vector<int> FIXERS;
-std::vector<std::vector<int>> TREAD;
-std::vector<std::vector<int>> DEAD;
 
 /*
 bool in_range (Loc loc) {
@@ -43,9 +38,6 @@ int check_kernel (Area &area, Loc loc) {
         if(area.inspect(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == DEBRIS) {
             yeet += 1;
         }
-        else if (map.in_range({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]})) {
-            DEAD[row + NEIGHBORS[i][0]][col + NEIGHBORS[i][1]] += 1;
-        }
     }
     return yeet;
 }
@@ -58,26 +50,20 @@ void onStart(int num, int rows, int cols, double mpr,
 	ROWS = rows;
 	COLS = cols;
 
-    TREAD.resize(ROWS, std::vector<int>(COLS, 0));
-    DEAD.resize(ROWS, std::vector<int>(COLS, 0));
-    
     map = Map(ROWS,COLS,NUM);
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < COLS; c++) {
             if (area.inspect(r,c) != DEBRIS) { 
                 map.update({r,c},EMPT);
-                DEAD[r][c] += 1;
             }
             if (area.inspect(r,c) == DEBRIS) { 
                 map.update({r,c},TRASH);
-                TREAD[r][c] -= 1;
             }
         }
     }
     for (int i = 0; i < NUM; i++) {
         map.update(area.locate(i), ROBOT, i);
-        TREAD[area.locate(i).r][area.locate(i).c] += 1;
-        log << i << "\t" << area.locate(i).r << ", " << area.locate(i).c << endl;
+        //log << i << "\t" << area.locate(i).r << ", " << area.locate(i).c << endl;
     }
 
     BROKEN_LOC.resize(NUM);
@@ -85,15 +71,15 @@ void onStart(int num, int rows, int cols, double mpr,
 	
     log << "Start!" << endl;
 }
+
 /* Deciding robot's next move */
 Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
     int row = loc.r; 
 	int col = loc.c;
 
     map.update(loc,EMPT);
-    
-    TREAD[row][col] += 1;
-
+    int b_r = map.b_r();    
+    int b_c = map.b_c();    
     if (area.inspect(row, col) == DEBRIS) {
 		return COLLECT;
 	}
@@ -162,15 +148,14 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 default: return DOWN;
                 }
             }
-            else if (map.in_range({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]})) {
-                DEAD[row + NEIGHBORS[i][0]][col + NEIGHBORS[i][1]] += 1;
-            }
         }
         
-        if (row <= map.b_r() && map.in_range({map.b_r() + 1,col})) {
+        if (row <= b_r && map.in_range({b_r + 1,col})) {
+            map.update({row+1,col},ROBOT,id);
             return DOWN;
         }
-        if (col <= map.b_c() && map.in_range({row,map.b_c() + 1})) {
+        if (col <= b_c && map.in_range({row,b_c + 1})) {
+            map.update({row,col+1},ROBOT,id);
             return RIGHT;
         }
         
@@ -181,15 +166,15 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 best = map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? i : best;
                 bestv =  map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? map.tread({row + ADJC[i][0],col + ADJC[i][1]}) : bestv;
             }
-            else if (row+ADJC[i][0] < BOUND_R-1) {
+            else if (row+ADJC[i][0] < b_r-1) {
                 map.update({row+1,col},ROBOT,id);
                 return DOWN;
             }
-            else if (row+ADJC[i][0] == ROWS - 1) {
+            else if (row+ADJC[i][0] == b_r - 1) {
                 map.update({row-1,col},ROBOT,id);
                 return UP;
             }
-            else if (col+ADJC[i][1] < BOUND_C-1) {
+            else if (col+ADJC[i][1] < b_c-1) {
                 map.update({row,col+1},ROBOT,id);
                 return RIGHT;
             }
@@ -208,7 +193,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 }
 
 void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
-	log << "Robot " << id << " is damaged (" << loc.r << ", " << loc.c << ")" << endl;
+	//log << "Robot " << id << " is damaged (" << loc.r << ", " << loc.c << ")" << endl;
     BROKEN_LOC[id] = loc;
     map.update(loc,DED,id);
     int min = ROWS * COLS;
@@ -227,8 +212,7 @@ void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
 
 void onClockTick(int time, ostream &log) {
 	if (time % 100 == 0) {
-        log << time << "\t" << BOUND_R << ", " << BOUND_C << "\t"<< map.b_r() << ", " << map.b_c() << "\t" << "\t" <<  map.clear() << " / " << map.pile() << "\t" << NUM << endl;
-        log << endl;
+        log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << "\t" <<  map.clear() << " / " << map.pile() << "\t" << NUM << endl;
     }
 }
 
