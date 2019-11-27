@@ -255,6 +255,33 @@ cols:
 	35	   823
 ```
 
+### 11/27/19 12:00 Bounding from both sides
+```
+Average collection rate:
+	all	   875 	 -> 	(Score 74.4)
+mpr:
+	0.0	  1069
+	0.0002	  1077
+	0.005	  1052
+	0.02	   914
+	0.4	   263
+debris:
+	0.2	   275
+	0.5	   858
+	0.8	  1493
+num:
+	2	  1079
+	5	   960
+	15	   801
+	30	   661
+rows:
+	15	   932
+	35	   818
+cols:
+	15	   904
+	35	   846
+```
+
 ## Do Not Repeat
 - avoid previous location
-- bounding from all sides... kinda weird but I'll take it
+- ~bounding from all sides... kinda weird but I'll take it~
