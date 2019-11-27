@@ -20,11 +20,6 @@ const int ADJC[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
 vector<Loc> BROKEN_LOC;  
 std::vector<int> FIXERS;
 
-/*
-bool in_range (Loc loc) {
-  return (loc.r >= BOUND_R && loc.c >= BOUND_C && loc.r < ROWS && loc.c < COLS);
-}
-*/
 double manhattanDist(Loc start, Loc target) {
     return abs(start.c-target.c) + abs(start.r-target.r);
 }
@@ -51,6 +46,7 @@ void onStart(int num, int rows, int cols, double mpr,
 	COLS = cols;
 
     map = Map(ROWS,COLS,NUM);
+    
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < COLS; c++) {
             if (area.inspect(r,c) != DEBRIS) { 
@@ -78,8 +74,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 	int col = loc.c;
 
     map.update(loc,EMPT);
-    int b_r = map.b_r();    
-    int b_c = map.b_c();    
     if (area.inspect(row, col) == DEBRIS) {
 		return COLLECT;
 	}
@@ -150,11 +144,11 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             }
         }
         
-        if (row <= b_r && map.in_range({b_r + 1,col})) {
+        if (row <= map.b_r() && map.in_range({map.b_r() + 1,col})) {
             map.update({row+1,col},ROBOT,id);
             return DOWN;
         }
-        if (col <= b_c && map.in_range({row,b_c + 1})) {
+        if (col <= map.b_c() && map.in_range({row,map.b_c() + 1})) {
             map.update({row,col+1},ROBOT,id);
             return RIGHT;
         }
@@ -166,15 +160,15 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 best = map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? i : best;
                 bestv =  map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? map.tread({row + ADJC[i][0],col + ADJC[i][1]}) : bestv;
             }
-            else if (row+ADJC[i][0] < b_r-1) {
+            else if (row+ADJC[i][0] < map.b_r()-1) {
                 map.update({row+1,col},ROBOT,id);
                 return DOWN;
             }
-            else if (row+ADJC[i][0] == b_r - 1) {
+            else if (row+ADJC[i][0] == map.b_r() - 1) {
                 map.update({row-1,col},ROBOT,id);
                 return UP;
             }
-            else if (col+ADJC[i][1] < b_c-1) {
+            else if (col+ADJC[i][1] < map.b_c()-1) {
                 map.update({row,col+1},ROBOT,id);
                 return RIGHT;
             }
@@ -183,6 +177,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         //log << bestv << "\t" << map.tread({row + ADJC[best][0],col + ADJC[best][1]}) << endl; 
         
         map.update({row + ADJC[best][0],col + ADJC[best][1]},ROBOT,id);
+        
         switch(best) {
 		case 0: return UP;
 		case 1: return LEFT;
