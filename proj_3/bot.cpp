@@ -25,11 +25,11 @@ std::vector<int> FIXERS;
 std::vector<std::vector<int>> TREAD;
 std::vector<std::vector<int>> DEAD;
 
-
+/*
 bool in_range (Loc loc) {
   return (loc.r >= BOUND_R && loc.c >= BOUND_C && loc.r < ROWS && loc.c < COLS);
 }
-
+*/
 double manhattanDist(Loc start, Loc target) {
     return abs(start.c-target.c) + abs(start.r-target.r);
 }
@@ -49,38 +49,7 @@ int check_kernel (Area &area, Loc loc) {
     }
     return yeet;
 }
-/*
-void bounds(Area &area) {
-    std::vector<bool> all_ded_c;
-    all_ded_c.resize(COLS, true);
-    std::vector<bool> all_ded_r;
-    all_ded_r.resize(ROWS, true);
-    for (int r = BOUND_R; r < ROWS; r++) {
-        for (int c = BOUND_C; c < COLS; c++) {
-            int t = TREAD[r][c] > 0 ? 1 : 0; 
-            int d = DEAD[r][c] > 0 ? 1 : 0; 
-            int a = (t == 0 && d == 0) ? ((area.inspect(r,c) != DEBRIS) ? 1 : 0) : 1;
-            if (a > 0) {
-                DEAD[r][c] += 1;
-            }
-            all_ded_r[r] = (t > 0 && d > 0 && a > 0) ? all_ded_r[r] : false;
-            all_ded_c[c] = (t > 0 && d > 0 && a > 0) ? all_ded_c[c] : false;
-        }
-    }
-    for (int i = BOUND_C + 1; i < COLS; i++) {
-        if (!all_ded_c[i]) {
-            BOUND_C = i - 1;
-            break;
-        }
-    }
-    for (int i = BOUND_R + 1; i < ROWS; i++) {
-        if (!all_ded_r[i]) {
-            BOUND_R = i - 1;
-            break;
-        }
-    }
-}
-*/
+
 /* Initialization procedure, called when the game starts: */
 void onStart(int num, int rows, int cols, double mpr,
              Area &area, ostream &log)
@@ -91,6 +60,7 @@ void onStart(int num, int rows, int cols, double mpr,
 
     TREAD.resize(ROWS, std::vector<int>(COLS, 0));
     DEAD.resize(ROWS, std::vector<int>(COLS, 0));
+    
     map = Map(ROWS,COLS,NUM);
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < COLS; c++) {
@@ -100,11 +70,12 @@ void onStart(int num, int rows, int cols, double mpr,
             }
             if (area.inspect(r,c) == DEBRIS) { 
                 map.update({r,c},TRASH);
+                TREAD[r][c] -= 1;
             }
         }
     }
     for (int i = 0; i < NUM; i++) {
-        map.update(area.locate(i), ROBOT);
+        map.update(area.locate(i), ROBOT, i);
         TREAD[area.locate(i).r][area.locate(i).c] += 1;
         log << i << "\t" << area.locate(i).r << ", " << area.locate(i).c << endl;
     }
@@ -112,15 +83,12 @@ void onStart(int num, int rows, int cols, double mpr,
     BROKEN_LOC.resize(NUM);
     FIXERS.resize(NUM, -1);
 	
-    //bounds(area);
     log << "Start!" << endl;
 }
 /* Deciding robot's next move */
 Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
-	//bounds(area);
     int row = loc.r; 
 	int col = loc.c;
-    
 
     map.update(loc,EMPT);
     
@@ -176,8 +144,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		}
     }
     else {
-	    //bounds(area);
-
         for (int i = 0; i < 12; i++) {
             if(area.inspect(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == DEBRIS) {
                 map.update({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]},ROBOT,id);
@@ -196,23 +162,22 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 default: return DOWN;
                 }
             }
-            else if (in_range({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]})) {
+            else if (map.in_range({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]})) {
                 DEAD[row + NEIGHBORS[i][0]][col + NEIGHBORS[i][1]] += 1;
             }
         }
+        
         if (row <= map.b_r() && map.in_range({map.b_r() + 1,col})) {
             return DOWN;
         }
         if (col <= map.b_c() && map.in_range({row,map.b_c() + 1})) {
             return RIGHT;
         }
+        
         int best = -1;
         int bestv = ROWS * COLS;
         for (int i = 0; i < 4; i++) {
-            if (in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
-                //best = TREAD[row + ADJC[i][0]][col + ADJC[i][1]] < bestv ? i : best;
-                //bestv = TREAD[row + ADJC[i][0]][col + ADJC[i][1]] < bestv ? TREAD[row + ADJC[i][0]][col + ADJC[i][1]] : bestv;
-            
+            if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
                 best = map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? i : best;
                 bestv =  map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? map.tread({row + ADJC[i][0],col + ADJC[i][1]}) : bestv;
             }

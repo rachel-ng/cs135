@@ -63,7 +63,7 @@ bool Map::update (Loc loc, Places p) {
         if(loc.c > BOUND_C) {
             bound_c();
         }
-        if (loc.r <= BOUND_R || loc.c <= BOUND_C) {
+        if (loc.r <= BOUND_R || loc.c <= BOUND_C) { 
             TREAD[loc.r][loc.c] += 1;
         }
 
@@ -106,7 +106,7 @@ bool Map::update (Loc loc, Places p, int id) {
         if(loc.c > BOUND_C) {
             bound_c();
         }
-        if (loc.r <= BOUND_R || loc.c <= BOUND_C) {
+        if (loc.r <= BOUND_R || loc.c <= BOUND_C) { 
             TREAD[loc.r][loc.c] += 1;
         }
         return true;
@@ -134,8 +134,8 @@ int Map::pile () {
 }
 
 void Map::bound_r() {
+    bool rip = true;
     for (int i = BOUND_R; i < ROWS; i++) {
-        bool rip = true;
         for (int c = BOUND_C; c < COLS; c++) {
             if (!covered[i][c]) {
                 rip = false;
@@ -152,8 +152,8 @@ void Map::bound_r() {
 }
 
 void Map::bound_c() {
+    bool rip = true;
     for (int i = BOUND_C; i < COLS; i++) {
-        bool rip = true;
         for (int r = BOUND_R; r < ROWS; r++) {
             if (!covered[r][i]) {
                 rip = false;
