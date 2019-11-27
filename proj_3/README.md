@@ -201,6 +201,33 @@ cols:
 	35	   568 
 ```
 
+### 11/27/19 1:00 Bounding (fixed)
+```
+Average collection rate:
+	all	   695 	 -> 	(Score 59.1)
+mpr:
+	0.0	   858
+	0.0002	   828
+	0.005	   815
+	0.02	   729
+	0.4	   243
+debris:
+	0.2	     0
+	0.5	   670
+	0.8	  1426
+num:
+	2	   776
+	5	   732
+	15	   652
+	30	   618
+rows:
+	15	   758
+	35	   631
+cols:
+	15	   771
+	35	   619
+```
+
 ## Do Not Repeat
 - avoid previous location
 - bounding from all sides... kinda weird but I'll take it

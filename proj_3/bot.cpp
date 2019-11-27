@@ -20,7 +20,6 @@ int BOUND_C = 0;
 const int NEIGHBORS[12][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1},{-2,0},{0,-2},{0,2},{2,0}};
 const int ADJC[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
 
-vector<Loc> LOCATIONS;  
 vector<Loc> BROKEN_LOC;  
 std::vector<int> FIXERS;
 std::vector<std::vector<int>> TREAD;
@@ -90,12 +89,14 @@ void onStart(int num, int rows, int cols, double mpr,
 	ROWS = rows;
 	COLS = cols;
 
-
+    TREAD.resize(ROWS, std::vector<int>(COLS, 0));
+    DEAD.resize(ROWS, std::vector<int>(COLS, 0));
     map = Map(ROWS,COLS,NUM);
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < COLS; c++) {
-            if (area.inspect(r,c) == EMPTY) { 
+            if (area.inspect(r,c) != DEBRIS) { 
                 map.update({r,c},EMPT);
+                DEAD[r][c] += 1;
             }
             if (area.inspect(r,c) == DEBRIS) { 
                 map.update({r,c},TRASH);
@@ -104,14 +105,12 @@ void onStart(int num, int rows, int cols, double mpr,
     }
     for (int i = 0; i < NUM; i++) {
         map.update(area.locate(i), ROBOT);
+        TREAD[area.locate(i).r][area.locate(i).c] += 1;
+        log << i << "\t" << area.locate(i).r << ", " << area.locate(i).c << endl;
     }
 
-
-    LOCATIONS.resize(NUM);
     BROKEN_LOC.resize(NUM);
     FIXERS.resize(NUM, -1);
-    TREAD.resize(ROWS, std::vector<int>(COLS, 0));
-    DEAD.resize(ROWS, std::vector<int>(COLS, 0));
 	
     bounds(area);
     log << "Start!" << endl;
@@ -121,10 +120,10 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 	bounds(area);
     int row = loc.r; 
 	int col = loc.c;
-	
+    
+
     map.update(loc,EMPT);
     
-    LOCATIONS[id] = loc;
     TREAD[row][col] += 1;
 
     if (area.inspect(row, col) == DEBRIS) {
@@ -139,48 +138,49 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         pref_c = target_c == col ? 0 : pref_c;
 
         if (target_r == row && abs(target_c-col) == 1) {
+            map.update({row,col + pref_c},ROBOT,FIXERS[id]);
             FIXERS[id] = -1;
-            map.update({row,col + pref_c},ROBOT);
             return pref_c == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
         }
         if (target_c == col && abs(target_r-row) == 1) {
+            map.update({row + pref_r,col},ROBOT,FIXERS[id]);
             FIXERS[id] = -1;
-            map.update({row + pref_r,col},ROBOT);
             return pref_r == -1 ? REPAIR_UP : REPAIR_DOWN; 
         }
 
         if (area.inspect(row + pref_r, col) == DEBRIS) {
-            map.update({row + pref_r,col},ROBOT);
+            map.update({row + pref_r,col},ROBOT,id);
             return pref_r == -1 ? UP : DOWN;
         }
         if (area.inspect(row, col + pref_c) == DEBRIS) {
-            map.update({row,col + pref_c},ROBOT);
+            map.update({row,col + pref_c},ROBOT,id);
             return pref_c == -1 ? LEFT : RIGHT;
         }
 
         if (pref_r == 0) {
-            map.update({row,col + pref_c},ROBOT);
+            map.update({row,col + pref_c},ROBOT,id);
             return pref_c == -1 ? LEFT : RIGHT;
         }
         if (pref_c == 0) {
-            map.update({row + pref_r,col},ROBOT);
+            map.update({row + pref_r,col},ROBOT,id);
             return pref_r == -1 ? UP : DOWN;
         }
         
         switch(rand() % 1) {
 		case 0:
-            map.update({row + pref_r,col},ROBOT);
+            map.update({row + pref_r,col},ROBOT,id);
             return pref_r == -1 ? UP : DOWN;
         default:
-            map.update({row,col + pref_c},ROBOT);
+            map.update({row,col + pref_c},ROBOT,id);
             return pref_c == -1 ? LEFT : RIGHT;
 		}
     }
     else {
 	    bounds(area);
+
         for (int i = 0; i < 12; i++) {
             if(area.inspect(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == DEBRIS) {
-                map.update({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]},ROBOT);
+                map.update({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]},ROBOT,id);
                 switch(i) {
                 case 0: return UP;
                 case 1: return LEFT;
@@ -200,7 +200,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 DEAD[row + NEIGHBORS[i][0]][col + NEIGHBORS[i][1]] += 1;
             }
         }
-        
         int best = -1;
         int bestv = ROWS * COLS;
         for (int i = 0; i < 4; i++) {
@@ -211,23 +210,23 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 best = map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? i : best;
                 bestv =  map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? map.tread({row + ADJC[i][0],col + ADJC[i][1]}) : bestv;
             }
-            else if (row+ADJC[i][0] <= BOUND_R) {
-                map.update({row+1,col},ROBOT);
+            else if (row+ADJC[i][0] < map.b_r() + 1) {
+                map.update({row+1,col},ROBOT,id);
                 return DOWN;
             }
             else if (row+ADJC[i][0] == ROWS - 1) {
-                map.update({row-1,col},ROBOT);
+                map.update({row-1,col},ROBOT,id);
                 return UP;
             }
-            else if (col+ADJC[i][1] <= BOUND_C) {
-                map.update({row,col+1},ROBOT);
+            else if (col+ADJC[i][1] < map.b_c() + 1) {
+                map.update({row,col+1},ROBOT,id);
                 return RIGHT;
             }
         }
 
         //log << bestv << "\t" << map.tread({row + ADJC[best][0],col + ADJC[best][1]}) << endl; 
         
-        map.update({row + ADJC[best][0],col + ADJC[best][1]},ROBOT);
+        map.update({row + ADJC[best][0],col + ADJC[best][1]},ROBOT,id);
         switch(best) {
 		case 0: return UP;
 		case 1: return LEFT;
@@ -240,12 +239,13 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
 	log << "Robot " << id << " is damaged (" << loc.r << ", " << loc.c << ")" << endl;
     BROKEN_LOC[id] = loc;
+    map.update(loc,DED,id);
     int min = ROWS * COLS;
     int fix = -1;
     for (int i = 0; i < NUM; i++) {
         if (i != id && FIXERS[i] == -1) {
-            if (manhattanDist(loc, LOCATIONS[i]) < min) {
-                min = manhattanDist(loc, LOCATIONS[i]);
+            if (manhattanDist(loc, area.locate(i)) < min) {
+                min = manhattanDist(loc, area.locate(i));
                 fix = i;
             }
         }
@@ -256,7 +256,7 @@ void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
 
 void onClockTick(int time, ostream &log) {
 	if (time % 100 == 0) {
-        log << time << "\t" << BOUND_R << ", " << BOUND_C<< endl;
+        log << time << "\t" << BOUND_R << ", " << BOUND_C << "\t"<< map.b_r() << ", " << map.b_c() << "\t" << "\t" <<  map.clear() << " / " << map.pile() << "\t" << NUM << endl;
         log << endl;
     }
 }
