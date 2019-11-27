@@ -4,7 +4,7 @@ INSTALL = install
 EXEC    = mission
 
 # Sources
-SRCS_0 = area.cpp bot.cpp outstream.cpp state.cpp output.cpp
+SRCS_0 = area.cpp bot.cpp outstream.cpp state.cpp output.cpp map.cpp
 SRCS = $(SRCS_0) main.cpp
 HDRS = $(SRCS_0:.cpp=.h) 
 OBJS = $(SRCS:.cpp=.o)
