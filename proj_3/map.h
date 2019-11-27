@@ -33,6 +33,8 @@ public:
     int clear ();
     int pile ();
     void bound();
+    void bound_r();
+    void bound_c();
     int b_r();
     int b_c();
 };

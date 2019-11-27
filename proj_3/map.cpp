@@ -48,6 +48,8 @@ bool Map::update (Loc loc, Places p) {
         }
         if (prev == TRASH) {
             cleared -= 1;
+            TREAD[loc.r][loc.c] = 1;
+            DEAD[loc.r][loc.c] = 1;
         }
         if (p == EMPT) {
             covered[loc.r][loc.c] = true;
@@ -55,6 +57,15 @@ bool Map::update (Loc loc, Places p) {
             TREAD[loc.r][loc.c] += 1;
         }
         //bound();
+        //bound_r();
+        //bound_c();
+        if(loc.r > BOUND_R) {
+            bound_r(); 
+        }
+        if(loc.c > BOUND_C) {
+            bound_c();
+        }
+
         return true;
     }
     return false;
@@ -75,6 +86,8 @@ bool Map::update (Loc loc, Places p, int id) {
         }
         if (prev == TRASH) {
             cleared -= 1;
+            TREAD[loc.r][loc.c] = 1;
+            DEAD[loc.r][loc.c] = 1;
         }
         if (p == EMPT) {
             covered[loc.r][loc.c] = true;
@@ -86,7 +99,12 @@ bool Map::update (Loc loc, Places p, int id) {
             TREAD[loc.r][loc.c] += 1;
             DEAD[loc.r][loc.c] += 1;
         }
-        //bound();
+        if(loc.r > BOUND_R) {
+            bound_r(); 
+        }
+        if(loc.c > BOUND_C) {
+            bound_c();
+        }
         return true;
     }
     return false;
@@ -111,6 +129,85 @@ int Map::pile () {
     return piles;
 }
 
+void Map::bound_r() {
+    for (int i = BOUND_R; i < ROWS; i++) {
+        bool rip = true;
+        for (int c = BOUND_C; c < COLS; c++) {
+            if (!covered[i][c]) {
+                rip = false;
+                break;
+            }
+        }
+        if (rip) {
+            BOUND_R = i;
+        }
+        else {
+            break;
+        }
+    }
+}
+
+void Map::bound_c() {
+    for (int i = BOUND_C; i < COLS; i++) {
+        bool rip = true;
+        for (int r = BOUND_R; r < ROWS; r++) {
+            if (!covered[r][i]) {
+                rip = false;
+                break;
+            }
+        }
+        if (rip) {
+            BOUND_C = i;
+        }
+        else {
+            break;
+        }
+    }
+}
+/*
+void Map::bound_rb() {
+    for (int i = BOUND_R; i < ROWS; i++) {
+        bool rip = true;
+        for (int c = BOUND_C; c < COLS; c++) {
+            if (!covered[i][c]) {
+                rip = false;
+                break;
+            }
+        }
+        if (rip) {
+            BOUND_R = i;
+        }
+        else {
+            break;
+        }
+    }
+}
+
+void Map::bound_cb() {
+    for (int i = BOUND_CB; i > BOUND_C; i++) {
+        bool rip = true;
+        for (int r = BOUND_R; r < BOUND_RB; r++) {
+            if (!covered[r][i]) {
+                rip = false;
+                break;
+            }
+        }
+        if (rip) {
+            BOUND_C = i;
+        }
+        else {
+            break;
+        }
+    }
+}*/
+/*int Map::bound_c() {
+    for (int i = BOUND_C + 1; i < COLS; i++) {
+        if (!all_ded_c[i]) {
+            BOUND_C = i - 1;
+            break;
+        }
+    }
+}*/
 int Map::b_r() {
     return BOUND_R;
 }

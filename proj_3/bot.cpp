@@ -59,7 +59,7 @@ void bounds(Area &area) {
         for (int c = BOUND_C; c < COLS; c++) {
             int t = TREAD[r][c] > 0 ? 1 : 0; 
             int d = DEAD[r][c] > 0 ? 1 : 0; 
-            int a = (t == 0 && d == 0) ? ((area.inspect(r,c) == EMPTY) ? 1 : 0) : 1;
+            int a = (t == 0 && d == 0) ? ((area.inspect(r,c) != DEBRIS) ? 1 : 0) : 1;
             if (a > 0) {
                 DEAD[r][c] += 1;
             }
@@ -200,6 +200,12 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 DEAD[row + NEIGHBORS[i][0]][col + NEIGHBORS[i][1]] += 1;
             }
         }
+        if (row <= map.b_r() && map.in_range({map.b_r() + 1,col})) {
+            return DOWN;
+        }
+        if (col <= map.b_c() && map.in_range({row,map.b_c() + 1})) {
+            return RIGHT;
+        }
         int best = -1;
         int bestv = ROWS * COLS;
         for (int i = 0; i < 4; i++) {
@@ -210,7 +216,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 best = map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? i : best;
                 bestv =  map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? map.tread({row + ADJC[i][0],col + ADJC[i][1]}) : bestv;
             }
-            else if (row+ADJC[i][0] < map.b_r() + 1) {
+            else if (row+ADJC[i][0] < BOUND_R-1) {
                 map.update({row+1,col},ROBOT,id);
                 return DOWN;
             }
@@ -218,7 +224,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 map.update({row-1,col},ROBOT,id);
                 return UP;
             }
-            else if (col+ADJC[i][1] < map.b_c() + 1) {
+            else if (col+ADJC[i][1] < BOUND_C-1) {
                 map.update({row,col+1},ROBOT,id);
                 return RIGHT;
             }
