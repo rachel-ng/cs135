@@ -49,7 +49,7 @@ int check_kernel (Area &area, Loc loc) {
     }
     return yeet;
 }
-
+/*
 void bounds(Area &area) {
     std::vector<bool> all_ded_c;
     all_ded_c.resize(COLS, true);
@@ -80,7 +80,7 @@ void bounds(Area &area) {
         }
     }
 }
-
+*/
 /* Initialization procedure, called when the game starts: */
 void onStart(int num, int rows, int cols, double mpr,
              Area &area, ostream &log)
@@ -112,12 +112,12 @@ void onStart(int num, int rows, int cols, double mpr,
     BROKEN_LOC.resize(NUM);
     FIXERS.resize(NUM, -1);
 	
-    bounds(area);
+    //bounds(area);
     log << "Start!" << endl;
 }
 /* Deciding robot's next move */
 Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
-	bounds(area);
+	//bounds(area);
     int row = loc.r; 
 	int col = loc.c;
     
@@ -176,7 +176,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		}
     }
     else {
-	    bounds(area);
+	    //bounds(area);
 
         for (int i = 0; i < 12; i++) {
             if(area.inspect(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == DEBRIS) {

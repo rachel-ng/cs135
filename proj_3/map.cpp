@@ -56,14 +56,15 @@ bool Map::update (Loc loc, Places p) {
             DEAD[loc.r][loc.c] += 1;
             TREAD[loc.r][loc.c] += 1;
         }
-        //bound();
-        //bound_r();
-        //bound_c();
+        
         if(loc.r > BOUND_R) {
             bound_r(); 
         }
         if(loc.c > BOUND_C) {
             bound_c();
+        }
+        if (loc.r <= BOUND_R || loc.c <= BOUND_C) {
+            TREAD[loc.r][loc.c] += 1;
         }
 
         return true;
@@ -104,6 +105,9 @@ bool Map::update (Loc loc, Places p, int id) {
         }
         if(loc.c > BOUND_C) {
             bound_c();
+        }
+        if (loc.r <= BOUND_R || loc.c <= BOUND_C) {
+            TREAD[loc.r][loc.c] += 1;
         }
         return true;
     }
@@ -200,14 +204,7 @@ void Map::bound_cb() {
         }
     }
 }*/
-/*int Map::bound_c() {
-    for (int i = BOUND_C + 1; i < COLS; i++) {
-        if (!all_ded_c[i]) {
-            BOUND_C = i - 1;
-            break;
-        }
-    }
-}*/
+
 int Map::b_r() {
     return BOUND_R;
 }
