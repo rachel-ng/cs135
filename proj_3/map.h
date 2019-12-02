@@ -17,8 +17,8 @@ public:
 
 class Map {
     std::vector<std::vector <Field> > field;
-    std::vector<std::vector <Places> > fields;
-    std::vector<std::vector <bool> > covered;
+    //std::vector<std::vector <Places> > fields;
+    //std::vector<std::vector <bool> > covered;
     std::vector<Loc> robots; 
     int ROWS;
     int COLS;
@@ -29,15 +29,15 @@ class Map {
     int BOUND_CB;
     int cleared = 0;
     int piles; 
-    std::vector<std::vector<int>> TREAD;
-    std::vector<std::vector<int>> DEAD;
+    //std::vector<std::vector<int>> TREAD;
+    //std::vector<std::vector<int>> DEAD;
 
 public:
     Map (int row, int col, int num);
     bool in_range (Loc loc);
     bool in_og_range (Loc loc);
-    Places peek (int row, int col);
-    Places peek (Loc loc);
+    Field peek (int row, int col);
+    Field peek (Loc loc);
     bool update (Loc loc, Places p);
     bool update (Loc loc, Places p, int id);
     int tread (Loc loc);
