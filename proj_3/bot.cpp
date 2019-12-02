@@ -156,7 +156,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             }
             else if (map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == ROBOT) {
                map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
-               //map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
             }
         }
         
@@ -185,8 +184,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         int bestv = ROWS * COLS;
         for (int i = 0; i < 4; i++) {
             if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
-                best = map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? i : best;
-                bestv =  map.tread({row + ADJC[i][0],col + ADJC[i][1]}) < bestv ? map.tread({row + ADJC[i][0],col + ADJC[i][1]}) : bestv;
+                best = map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread < bestv ? i : best;
+                bestv =  map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread < bestv ? map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread : bestv;
             }
             else if (row+ADJC[i][0] <= map.b_r()-1) {
                 map.update({row+1,col},ROBOT,id);
