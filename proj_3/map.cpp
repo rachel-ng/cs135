@@ -10,10 +10,15 @@ Map::Map (int row, int col, int num) {
     BOUND_RB = ROWS;
     piles = ROWS * COLS;
     robots.resize(NUM);
+    field.resize(ROWS, std::vector<Field>(COLS,{UNDEF,false,0,0}));
     fields.resize(ROWS, std::vector<Places>(COLS,UNDEF));
     covered.resize(ROWS, std::vector<bool>(COLS,false));
     TREAD.resize(ROWS, std::vector<int>(COLS,0));
     DEAD.resize(ROWS, std::vector<int>(COLS,0));
+}
+
+bool Map::in_og_range (Loc loc) {
+  return (loc.r >= 0 && loc.c >= 0 && loc.r < ROWS && loc.c < COLS);
 }
 
 bool Map::in_range (Loc loc) {
@@ -36,7 +41,7 @@ Places Map::peek (Loc loc) {
 }
     
 bool Map::update (Loc loc, Places p) {
-    if (in_range(loc)) {
+    if (in_og_range(loc)) {
         Places prev = fields[loc.r][loc.c];
         fields[loc.r][loc.c] = p;
         if (p == TRASH) {
@@ -80,18 +85,19 @@ bool Map::update (Loc loc, Places p) {
 }
 
 bool Map::update (Loc loc, Places p, int id) {
-    if (in_range(loc)) {
+    if (in_og_range(loc)) {
         Places prev = fields[loc.r][loc.c];
         fields[loc.r][loc.c] = p;
         if (p == TRASH) {
             cleared += 1;
             TREAD[loc.r][loc.c] -= 1;
             for (int i = 0; i < 12; i++) {
-                if(in_range({loc.r + NEIGHBORS[i][0],loc.c + NEIGHBORS[i][1]})) {
+                if(in_og_range({loc.r + NEIGHBORS[i][0],loc.c + NEIGHBORS[i][1]})) {
                     TREAD[loc.r + NEIGHBORS[i][0]][loc.c + NEIGHBORS[i][1]] -= 1;
                 }
             }
         }
+
         if (prev == TRASH) {
             cleared -= 1;
             TREAD[loc.r][loc.c] = 1;
@@ -135,6 +141,16 @@ int Map::tread (Loc loc) {
 int Map::dead (Loc loc) {
     return DEAD[loc.r][loc.c];
 }
+
+void Map::treaded (Loc loc) {
+    TREAD[loc.r][loc.c] += 1;
+}
+
+void Map::deaded (Loc loc) {
+    DEAD[loc.r][loc.c] += 1;
+}
+
+
 Loc Map::locate (int id) {
     return robots[id];
 }

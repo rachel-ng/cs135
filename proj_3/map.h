@@ -6,7 +6,17 @@
 #include "common.h"
 
 enum Places {EMPT, TRASH, UNDEF, ROBOT, DED};
+
+class Field {
+public:
+    Places status;
+    bool covered;
+    int tread;
+    int dead;
+};
+
 class Map {
+    std::vector<std::vector <Field> > field;
     std::vector<std::vector <Places> > fields;
     std::vector<std::vector <bool> > covered;
     std::vector<Loc> robots; 
@@ -25,12 +35,15 @@ class Map {
 public:
     Map (int row, int col, int num);
     bool in_range (Loc loc);
+    bool in_og_range (Loc loc);
     Places peek (int row, int col);
     Places peek (Loc loc);
     bool update (Loc loc, Places p);
     bool update (Loc loc, Places p, int id);
     int tread (Loc loc);
     int dead (Loc loc);
+    void treaded (Loc loc);
+    void deaded (Loc loc);
     Loc locate (int id);
     int clear ();
     int pile ();

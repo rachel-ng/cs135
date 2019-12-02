@@ -72,12 +72,19 @@ void onStart(int num, int rows, int cols, double mpr,
 Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
     int row = loc.r; 
 	int col = loc.c;
-
+    if (area.locate(id).r != map.locate(id).r && area.locate(id).c != map.locate(id).c) {
+        log << id << endl;
+        log << area.locate(id).r << ", " <<area.locate(id).c << "\t" << map.locate(id).r << ", " << map.locate(id).c << endl;
+        log << area.inspect(area.locate(id)) << "\t" << area.inspect(map.locate(id)) << endl;
+        log << map.peek(area.locate(id)) << "\t" << map.peek(map.locate(id)) << endl; 
+    } 
     map.update(loc,EMPT);
     if (area.inspect(row, col) == DEBRIS) {
+        map.update(loc,ROBOT,id);
 		return COLLECT;
 	}
     else if (FIXERS[id] != -1) {
+        // if it's targeting a broken robot 
         int target_r = BROKEN_LOC[FIXERS[id]].r;
         int target_c = BROKEN_LOC[FIXERS[id]].c;
         int pref_r = target_r < row ? -1 : 1;
@@ -85,6 +92,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         pref_r = target_r == row ? 0 : pref_r;
         pref_c = target_c == col ? 0 : pref_c;
 
+        // if it's right next to The Broken Robot 
         if (target_r == row && abs(target_c-col) == 1) {
             map.update({row,col + pref_c},ROBOT,FIXERS[id]);
             FIXERS[id] = -1;
@@ -96,6 +104,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             return pref_r == -1 ? REPAIR_UP : REPAIR_DOWN; 
         }
 
+        // chooses the field with debris to move to next
         if (area.inspect(row + pref_r, col) == DEBRIS) {
             map.update({row + pref_r,col},ROBOT,id);
             return pref_r == -1 ? UP : DOWN;
@@ -105,6 +114,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             return pref_c == -1 ? LEFT : RIGHT;
         }
 
+        // if no debris and row or col is the same, continue moving in the direction of the broekn robot
         if (pref_r == 0) {
             map.update({row,col + pref_c},ROBOT,id);
             return pref_c == -1 ? LEFT : RIGHT;
@@ -114,6 +124,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             return pref_r == -1 ? UP : DOWN;
         }
         
+        // choose a random spot
         switch(rand() % 1) {
 		case 0:
             map.update({row + pref_r,col},ROBOT,id);
@@ -124,6 +135,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		}
     }
     else {
+        // if it's next to a debris field
         for (int i = 0; i < 12; i++) {
             if(area.inspect(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == DEBRIS) {
                 map.update({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]},ROBOT,id);
@@ -142,8 +154,14 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 default: return DOWN;
                 }
             }
+            else if (map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) == ROBOT) {
+               map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
+               //map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
+            }
         }
         
+        // if it's out of bounds it continues to move until it's no longer out of bounds
+
         if (row <= map.b_r() && map.in_range({map.b_r() + 1,col})) {
             map.update({row+1,col},ROBOT,id);
             return DOWN;
@@ -160,6 +178,9 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             map.update({row,col-1},ROBOT,id);
             return LEFT;
         }
+
+        // choose the least treaded on field
+
         int best = -1;
         int bestv = ROWS * COLS;
         for (int i = 0; i < 4; i++) {
