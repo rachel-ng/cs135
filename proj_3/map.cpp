@@ -41,31 +41,39 @@ Places Map::peek (Loc loc) {
 }
     
 bool Map::update (Loc loc, Places p) {
-    if (in_og_range(loc)) {
+    if (in_range(loc)) {
         Places prev = fields[loc.r][loc.c];
         fields[loc.r][loc.c] = p;
+        field[loc.r][loc.c].status = p;
         if (p == TRASH) {
             cleared += 1;
             TREAD[loc.r][loc.c] -= 1;
+            field[loc.r][loc.c].tread -= 1;
             for (int i = 0; i < 8; i++) {
                 if(in_range({loc.r + NEIGHBORS[i][0],loc.c + NEIGHBORS[i][1]})) {
                     TREAD[loc.r + NEIGHBORS[i][0]][loc.c + NEIGHBORS[i][1]] -= 1;
+                    field[loc.r + NEIGHBORS[i][0]][loc.c + NEIGHBORS[i][1]].tread -= 1;
                 }
             }
         }
         if (prev == TRASH) {
             cleared -= 1;
-            TREAD[loc.r][loc.c] = 1;
+            TREAD[loc.r][loc.c] = 0;
             DEAD[loc.r][loc.c] = 1;
+            field[loc.r][loc.c].tread = 0;
+            field[loc.r][loc.c].dead = 1;
         }
         if (p == EMPT) {
             covered[loc.r][loc.c] = true;
             DEAD[loc.r][loc.c] += 1;
             TREAD[loc.r][loc.c] += 1;
+            field[loc.r][loc.c].dead += 1;
+            field[loc.r][loc.c].tread += 1;
         }
         
-        if (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB) { 
+        if (p!= TRASH && (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB)) { 
             TREAD[loc.r][loc.c] += 1;
+            field[loc.r][loc.c].tread += 1;
             return true;
         }
         
@@ -88,34 +96,46 @@ bool Map::update (Loc loc, Places p, int id) {
     if (in_og_range(loc)) {
         Places prev = fields[loc.r][loc.c];
         fields[loc.r][loc.c] = p;
+        field[loc.r][loc.c].status = p;
         if (p == TRASH) {
             cleared += 1;
             TREAD[loc.r][loc.c] -= 1;
+            field[loc.r][loc.c].tread -= 1;
             for (int i = 0; i < 12; i++) {
                 if(in_og_range({loc.r + NEIGHBORS[i][0],loc.c + NEIGHBORS[i][1]})) {
                     TREAD[loc.r + NEIGHBORS[i][0]][loc.c + NEIGHBORS[i][1]] -= 1;
+                    field[loc.r + NEIGHBORS[i][0]][loc.c + NEIGHBORS[i][1]].tread -= 1;
                 }
             }
         }
 
         if (prev == TRASH) {
             cleared -= 1;
-            TREAD[loc.r][loc.c] = 1;
+            TREAD[loc.r][loc.c] = 0;
             DEAD[loc.r][loc.c] = 1;
+            field[loc.r][loc.c].tread = 0;
+            field[loc.r][loc.c].dead = 1;
         }
         if (p == EMPT) {
             covered[loc.r][loc.c] = true;
             DEAD[loc.r][loc.c] += 1;
             TREAD[loc.r][loc.c] += 1;
+            field[loc.r][loc.c].dead += 1;
+            field[loc.r][loc.c].tread += 1;
         }
         else if (p == ROBOT) {
             robots[id] = loc;
             TREAD[loc.r][loc.c] += 1;
             DEAD[loc.r][loc.c] += 1;
+            field[loc.r][loc.c].dead += 1;
+            field[loc.r][loc.c].tread += 1;
         }
         
-        if (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB) { 
+        //if (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB) { 
+
+        if (p!= TRASH && (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB)) { 
             TREAD[loc.r][loc.c] += 1;
+            field[loc.r][loc.c].tread += 1;
             return true;
         }
 
@@ -144,12 +164,13 @@ int Map::dead (Loc loc) {
 
 void Map::treaded (Loc loc) {
     TREAD[loc.r][loc.c] += 1;
+    field[loc.r][loc.c].tread += 1;
 }
 
 void Map::deaded (Loc loc) {
     DEAD[loc.r][loc.c] += 1;
+    field[loc.r][loc.c].dead += 1;
 }
-
 
 Loc Map::locate (int id) {
     return robots[id];
