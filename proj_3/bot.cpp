@@ -72,11 +72,11 @@ void onStart(int num, int rows, int cols, double mpr,
 Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
     int row = loc.r; 
 	int col = loc.c;
-    if (area.locate(id).r != map.locate(id).r && area.locate(id).c != map.locate(id).c) {
+    if (area.locate(id).r != map.locate(id).loc.r && area.locate(id).c != map.locate(id).loc.c) {
         log << id << endl;
-        log << area.locate(id).r << ", " <<area.locate(id).c << "\t" << map.locate(id).r << ", " << map.locate(id).c << endl;
-        log << area.inspect(area.locate(id)) << "\t" << area.inspect(map.locate(id)) << endl;
-        log << map.peek(area.locate(id)).status << "\t" << map.peek(map.locate(id)).status << endl; 
+        log << area.locate(id).r << ", " <<area.locate(id).c << "\t" << map.locate(id).loc.r << ", " << map.locate(id).loc.c << endl;
+        log << area.inspect(area.locate(id)) << "\t" << area.inspect(map.locate(id).loc) << endl;
+        log << map.peek(area.locate(id)).status << "\t" << map.peek(map.locate(id).loc).status << endl; 
     } 
     map.update(loc,EMPT);
     if (area.inspect(row, col) == DEBRIS) {

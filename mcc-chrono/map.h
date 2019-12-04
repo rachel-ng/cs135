@@ -56,8 +56,10 @@ class Map {
 
 public:
     Map (int row, int col, int num);
-    bool in_range (Loc loc);
     bool in_og_range (Loc loc);
+    bool in_og_range (int r, int c);
+    bool in_range (Loc loc);
+    bool in_range (int r, int c);
     Robot locate (int id);
     Field peek (int row, int col);
     Field peek (Loc loc);
