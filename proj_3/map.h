@@ -70,7 +70,9 @@ public:
     Field peek (int row, int col);
     Field peek (Loc loc);
     int kernel (Loc loc);
+    int kernel (Loc loc, int size);
     int kernel (int row, int col);
+    int kernel (int row, int col, int size);
     bool update (Loc loc, Places p);
     bool update (Loc loc, Places p, int id);
     void treaded (Loc loc);
@@ -81,6 +83,7 @@ public:
     void fix (Loc loc, int id);
     void fixer (int id, int fix);
     void fixed (int id);
+    bool occupied(Loc loc);
     int clear ();
     int pile ();
     int ded ();
@@ -96,5 +99,6 @@ public:
 };
 
 double manhattanDist(Loc,Loc);
+bool comploc(Loc,Loc);
 
 #endif

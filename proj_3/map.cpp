@@ -1,10 +1,14 @@
 #include "map.h"
 
-
-const int NEIGHBORS[12][2] = {{-1,0},{0,-1},{0,1},{1,0},{-1,-1},{-1,1},{1,-1},{1,1},{-2,0},{0,-2},{0,2},{2,0}};
-
 double manhattanDist(Loc start, Loc target) {
     return abs(start.c-target.c) + abs(start.r-target.r);
+}
+
+bool comploc (Loc a, Loc b) {
+    if (a.r == b.r && a.c == b.c) {
+        return true;
+    }
+    return false;
 }
 
 Map::Map (int row, int col, int num) {
@@ -74,6 +78,24 @@ int Map::kernel (Loc loc) {
     return yeet;
 }
 
+int Map::kernel (Loc loc, int size) {
+    int yeet = 0;
+    //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
+    int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
+    int col = (loc.c >= BOUND_C) ? (loc.c > BOUND_CB) ? BOUND_CB : loc.c : BOUND_C;
+
+    for (int r = -size; r < size; r++) {
+        for (int c = -size; c < size; c++) {
+            if(in_og_range(row + r, col + c)) {
+                if (peek(row + r, col + c).status == TRASH) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
+
 int Map::kernel (int row, int col) {
     int yeet = 0;
     for (int r = -3; r < 3; r++) {
@@ -87,6 +109,21 @@ int Map::kernel (int row, int col) {
     }
     return yeet;
 }
+
+int Map::kernel (int row, int col, int size) {
+    int yeet = 0;
+    for (int r = -size; r < size; r++) {
+        for (int c = -size; c < size; c++) {
+            if(in_og_range(row + r, col + c)) {
+                if (peek(row + r, col + c).status == TRASH) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
+
 
 bool Map::update (Loc loc, Places p) {
     if (in_og_range(loc)) {
@@ -263,6 +300,10 @@ void Map::fixed (int id) {
     else {
         dead.pop_back();
     }
+}
+
+bool Map::empty(Loc loc) {
+    return (map.peek(loc).status != ROBOT || map.peek({loc).status != DED);
 }
 
 int Map::clear () {
