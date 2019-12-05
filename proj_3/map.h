@@ -83,7 +83,8 @@ public:
     void fix (Loc loc, int id);
     void fixer (int id, int fix);
     void fixed (int id);
-    bool empty(Loc loc);
+    bool bots(Loc loc);
+    bool bots(int row, int col);
     int clear ();
     int pile ();
     int ded ();

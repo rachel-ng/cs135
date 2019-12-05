@@ -160,7 +160,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 default: return DOWN;
                 }
             }
-            if (map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == ROBOT) {
+            //if (map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == ROBOT) {
+            if (!map.bots({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]})) {
                 map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
             }
             //check[i] = map.in_range(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) ?  map.kernel({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}) + ((12 - i) % 4): 0;
@@ -174,43 +175,66 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         } */
         
         // if it's out of bounds it continues to move until it's no longer out of bounds
-        if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && (map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
+        if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
+        //(map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
             return DOWN;
         }
-        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && (map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
+        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
+
+        //(map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
             return RIGHT;
         }
-        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && (map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
+        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
+ 
+        //(map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
             return LEFT;
         }
  
-        if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && (map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
+        if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
+        
+        //(map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
             return UP;
         }
-        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && (map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
+        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
+
+        //(map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
             return RIGHT;
         }
-        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && (map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
+        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
+
+        //(map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
             return LEFT;
         }
         
-        if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && (map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
+        if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
+
+        //(map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
             return RIGHT;
         }
-        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && (map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
+        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
+
+        //(map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
             return DOWN;
         }
-        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && (map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
+        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
+
+        //(map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
             return UP;
         }
         
-        if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && (map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
+        if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
+
+        //(map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
             return LEFT;
         }
-        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && (map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
+        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
+
+        //(map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
             return DOWN;
         }
-        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && (map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
+        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
+
+        //(map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
             return UP;
         }
 
@@ -231,16 +255,24 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 best = map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? i : best;
                 bestv =  map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus : bestv;
             }
-            else if (row+ADJC[i][0] <= map.b_r()-1 && (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
+            else if (row+ADJC[i][0] <= map.b_r()-1 && map.bots({row + ADJC[i][0],col + ADJC[i][1]})) {
+
+            //(map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
                 return DOWN;
             }
-            else if (row+ADJC[i][0] >= map.b_rb()+1 && (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
+            else if (row+ADJC[i][0] >= map.b_rb()+1 && map.bots({row + ADJC[i][0],col + ADJC[i][1]})) {
+
+            //(map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
                 return UP;
             }
-            else if (col+ADJC[i][1] <= map.b_c()-1 && (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
+            else if (col+ADJC[i][1] <= map.b_c()-1 && map.bots({row + ADJC[i][0],col + ADJC[i][1]})) {
+
+            //(map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
                 return RIGHT;
             }
-            else if (col+ADJC[i][1] >= map.b_cb()+1 && (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
+            else if (col+ADJC[i][1] >= map.b_cb()+1 && map.bots({row + ADJC[i][0],col + ADJC[i][1]})) {
+
+            //(map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT || map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != DED)) {
                 return LEFT;
             }
         }

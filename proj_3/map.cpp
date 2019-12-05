@@ -302,8 +302,12 @@ void Map::fixed (int id) {
     }
 }
 
-bool Map::empty(Loc loc) {
-    return (map.peek(loc).status != ROBOT || map.peek({loc).status != DED);
+bool Map::bots(Loc loc) {
+    return (peek(loc).status != ROBOT || peek(loc).status != DED);
+}
+
+bool Map::bots(int row, int col) {
+    return in_og_range(row,col) ? (peek(row,col).status != ROBOT || peek(row,col).status != DED) : false;
 }
 
 int Map::clear () {
