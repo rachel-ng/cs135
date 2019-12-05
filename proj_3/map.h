@@ -10,6 +10,7 @@ enum Places {EMPT, TRASH, UNDEF, ROBOT, DED};
 class Field {
 public:
     Places status;
+    Loc loc;
     bool covered;
     int tread;
     int dead;
@@ -19,20 +20,23 @@ public:
 class Robot {
 public:
     Loc loc = {-1,-1};
+    Loc ploc = {-1,-1};
     bool dead = false;
     int id;
-    int fixer = -1;
+    int fixer = -1; // robot that will fix this
+    int fixing = -1; // will fix this robot
     
     Robot (int i) {
         id = i;
     }
     
-    int fixing = -1;
-        void update (Loc l) {
+    void update (Loc l) {
+        ploc = loc;
         loc = l;
     }
     
     void update (Loc l, bool d) {
+        ploc = loc;
         loc = l;
         dead = d;
     }
@@ -43,6 +47,7 @@ public:
 class Map {
     std::vector<std::vector <Field> > fields;
     std::vector<Robot> robots; 
+    std::vector<int> dead; 
     int ROWS;
     int COLS;
     int NUM;
@@ -53,23 +58,31 @@ class Map {
     int cleared = 0;
     int def_clear = 0;
     int piles; 
+    int broken = 0;
 
 public:
     Map (int row, int col, int num);
-    bool in_range (Loc loc);
     bool in_og_range (Loc loc);
+    bool in_og_range (int r, int c);
+    bool in_range (Loc loc);
+    bool in_range (int r, int c);
     Robot locate (int id);
     Field peek (int row, int col);
     Field peek (Loc loc);
+    int kernel (Loc loc);
+    int kernel (int row, int col);
     bool update (Loc loc, Places p);
     bool update (Loc loc, Places p, int id);
     void treaded (Loc loc);
+    void treaded (Loc loc, int diff);
     void deaded (Loc loc);
     void set_default();
+    void fix (Loc loc, int id);
     void fixer (int id, int fix);
     void fixed (int id);
     int clear ();
     int pile ();
+    int ded ();
     void bound();
     void bound_r();
     void bound_c();
@@ -80,5 +93,7 @@ public:
     int b_rb();
     int b_cb();
 };
+
+double manhattanDist(Loc,Loc);
 
 #endif
