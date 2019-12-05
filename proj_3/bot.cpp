@@ -51,30 +51,32 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
     int row = loc.r; 
 	int col = loc.c;
     map.update(loc, ROBOT,id);
-   
+
     for (int i = 0; i < 4; i++) {
         if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
             if (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status == DED) {
                 Field r = map.peek({row + ADJC[i][0],col + ADJC[i][1]});
-                if (ADJC[i][1] != 0) {
-                    map.update({row + ADJC[i][0],col + ADJC[i][1]},ROBOT, r.robot);
-                    map.fixed(r.robot);
-                    log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
-                    return ADJC[i][1] == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
-                }
                 if (ADJC[i][0] != 0) {
                     map.update({row + ADJC[i][0],col + ADJC[i][1]},ROBOT,r.robot);
                     map.fixed(r.robot);
                     log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
                     return ADJC[i][0] == -1 ? REPAIR_UP : REPAIR_DOWN; 
                 }
-                   
+                if (ADJC[i][1] != 0) {
+                    map.update({row + ADJC[i][0],col + ADJC[i][1]},ROBOT, r.robot);
+                    map.fixed(r.robot);
+                    log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
+                    return ADJC[i][1] == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
+                }
             }
         }
     }
-
+    
     if (map.locate(id).dead) {
-		return COLLECT;
+		if (map.locate(id).fixer == -1) {
+            map.fix(loc,id);
+        }
+        return COLLECT;
     }
     else if (area.inspect(row, col) == DEBRIS) {
 		return COLLECT;
@@ -172,43 +174,43 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         } */
         
         // if it's out of bounds it continues to move until it's no longer out of bounds
-        if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.peek({row+1,col}).status != ROBOT) {
+        if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && (map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
             return DOWN;
         }
-        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1})) {
+        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && (map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
             return RIGHT;
         }
-        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1})) {
+        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && (map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
             return LEFT;
         }
  
-        if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.peek({row-1,col}).status != ROBOT) {
+        if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && (map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
             return UP;
         }
-        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.peek({row,col+1}).status != ROBOT) {
+        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && (map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
             return RIGHT;
         }
-        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.peek({row,col+1}).status != ROBOT) {
+        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && (map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
             return LEFT;
         }
         
-        if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.peek({row,col+1}).status != ROBOT) {
+        if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && (map.peek({row,col+1}).status != ROBOT || map.peek({row,col+1}).status != DED)) {
             return RIGHT;
         }
-        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.peek({row+1,col}).status != ROBOT) {
+        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && (map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
             return DOWN;
         }
-        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.peek({row-1,col}).status != ROBOT) {
+        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && (map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
             return UP;
         }
         
-        if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.peek({row,col-1}).status != ROBOT) {
+        if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && (map.peek({row,col-1}).status != ROBOT || map.peek({row,col-1}).status != DED)) {
             return LEFT;
         }
-        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.peek({row+1,col}).status != ROBOT) {
+        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && (map.peek({row+1,col}).status != ROBOT || map.peek({row+1,col}).status != DED)) {
             return DOWN;
         }
-        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.peek({row-1,col}).status != ROBOT) {
+        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && (map.peek({row-1,col}).status != ROBOT || map.peek({row-1,col}).status != DED)) {
             return UP;
         }
 
@@ -289,11 +291,12 @@ void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
     
     */
     map.fix(loc,id);
+    log << "Robot " << map.locate(id).fixer << " to fix " << id << "\t("<< loc.r << ", " << loc.c << ")" << "\t" << map.ded()<< endl;
 }
 
 void onClockTick(int time, ostream &log) {
 	if (time % 100 == 0) {
-        //log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << map.b_rb() << ", " << map.b_cb()<< "\t" <<  map.clear() << " / " << map.pile() << "\t" << map.ded()<< endl;
+        log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << map.b_rb() << ", " << map.b_cb()<< "\t" <<  map.clear() << " / " << map.pile() << endl;
     }
     
 }

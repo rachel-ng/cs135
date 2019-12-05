@@ -76,7 +76,6 @@ int Map::kernel (Loc loc) {
 
 int Map::kernel (int row, int col) {
     int yeet = 0;
-
     for (int r = -3; r < 3; r++) {
         for (int c = -3; c < 3; c++) {
             if(in_og_range(row + r, col + c)) {
@@ -205,6 +204,14 @@ bool Map::update (Loc loc, Places p, int id) {
         return true;
     }
     return false;
+}
+
+void Map::fix () {
+    for (int i = 0; i < dead.size(); i++) {
+        if (locate(dead[i]).fixer == -1) {
+            fix(locate(dead[i]).loc, dead[i]);
+        }
+    }
 }
 
 void Map::fix (Loc loc, int id) {

@@ -77,6 +77,7 @@ public:
     void treaded (Loc loc, int diff);
     void deaded (Loc loc);
     void set_default();
+    void fix ();
     void fix (Loc loc, int id);
     void fixer (int id, int fix);
     void fixed (int id);
