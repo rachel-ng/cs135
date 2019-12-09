@@ -30,19 +30,20 @@ void onStart(int num, int rows, int cols, double mpr,
     
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < COLS; c++) {
-            if (area.inspect(r,c) != DEBRIS) { 
+            map.update({r,c},area.inspect(r,c) == DEBRIS ? TRASH : EMPT);
+            /*if (area.inspect(r,c) != DEBRIS) { 
                 map.update({r,c},EMPT);
             }
             if (area.inspect(r,c) == DEBRIS) { 
                 map.update({r,c},TRASH);
-            }
+            }*/
         }
     }
+    
     for (int i = 0; i < NUM; i++) {
-        map.update(area.locate(i), ROBOT, i);
+        map.update(area.locate(i), ROBOT, i); 
         //log << i << "\t" << area.locate(i).r << ", " << area.locate(i).c << endl;
     }
-
 	
     log << "Start!" << endl;
 }
@@ -184,42 +185,42 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
             return DOWN;
         }
-        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
+        /*else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
             return RIGHT;
         }
         else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
             return LEFT;
-        }
+        }*/
  
         if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
             return UP;
         }
-        else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
+        /*else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
             return RIGHT;
         }
         else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
             return LEFT;
-        }
+        }*/
         
         if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
             return RIGHT;
         }
-        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
+        /*else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
             return DOWN;
         }
         else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
             return UP;
-        }
+        }*/
         
         if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
             return LEFT;
         }
-        else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
+        /*else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
             return DOWN;
         }
         else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
             return UP;
-        }
+        }*/
 
        
 
@@ -235,8 +236,10 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                         robonus += map.peek(row + ADJC[i][0] + NEIGHBORS[i][0], col + ADJC[i][1] + NEIGHBORS[i][1]).status == ROBOT ? (NUM / 2) : 0;
                     }
                 }
+                
                 best = map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? i : best;
                 bestv =  map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus : bestv;
+            
             }
             else if (row+ADJC[i][0] <= map.b_r()-1 && map.bots({row + ADJC[i][0],col + ADJC[i][1]})) {
                 return DOWN;
