@@ -282,6 +282,34 @@ cols:
 	35	   846
 ```
 
+### 12/09/19 10:00
+```
+Average collection rate:
+	all	   920 	 -> 	(Score 78.2)
+mpr:
+	0.0	  1124
+	0.0002	  1102
+	0.005	  1074
+	0.02	   950
+	0.4	   348
+debris:
+	0.2	   368
+	0.5	   885
+	0.8	  1506
+num:
+	2	  1141
+	5	  1025
+	15	   810
+	30	   703
+rows:
+	15	   952
+	35	   888
+cols:
+	15	   964
+	35	   875
+```
+
+
 ## Do Not Repeat
 - avoid previous location
 - ~bounding from all sides... kinda weird but I'll take it~
