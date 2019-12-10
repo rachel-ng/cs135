@@ -86,7 +86,7 @@ int Map::kernel (Loc loc, int size) {
 
     for (int r = -size; r < size; r++) {
         for (int c = -size; c < size; c++) {
-            if(in_og_range(row + r, col + c)) {
+            if(in_og_range(row + r, col + c) && !comploc(loc,{row + r, col + c})) {
                 if (peek(row + r, col + c).status == TRASH) {
                     yeet += 1;
                 }
@@ -100,7 +100,7 @@ int Map::kernel (int row, int col) {
     int yeet = 0;
     for (int r = -3; r < 3; r++) {
         for (int c = -3; c < 3; c++) {
-            if(in_og_range(row + r, col + c)) {
+            if(in_og_range(row + r, col + c) && !comploc({row,col},{row + r, col + c})) {
                 if (peek(row + r, col + c).status == TRASH) {
                     yeet += 1;
                 }
@@ -114,7 +114,7 @@ int Map::kernel (int row, int col, int size) {
     int yeet = 0;
     for (int r = -size; r < size; r++) {
         for (int c = -size; c < size; c++) {
-            if(in_og_range(row + r, col + c)) {
+            if(in_og_range(row + r, col + c) && !comploc({row,col},{row + r, col + c})) {
                 if (peek(row + r, col + c).status == TRASH) {
                     yeet += 1;
                 }
@@ -124,6 +124,69 @@ int Map::kernel (int row, int col, int size) {
     return yeet;
 }
 
+int Map::kernelr (Loc loc) {
+    int yeet = 0;
+    //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
+    int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
+    int col = (loc.c >= BOUND_C) ? (loc.c > BOUND_CB) ? BOUND_CB : loc.c : BOUND_C;
+
+    for (int r = -3; r < 3; r++) {
+        for (int c = -3; c < 3; c++) {
+            if(in_og_range(row + r, col + c) && !comploc(loc,{row + r, col + c})) {
+                if (peek(row + r, col + c).status == ROBOT) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
+
+int Map::kernelr (Loc loc, int size) {
+    int yeet = 0;
+    //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
+    int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
+    int col = (loc.c >= BOUND_C) ? (loc.c > BOUND_CB) ? BOUND_CB : loc.c : BOUND_C;
+
+    for (int r = -size; r < size; r++) {
+        for (int c = -size; c < size; c++) {
+            if(in_og_range(row + r, col + c) && !comploc(loc,{row + r, col + c})) {
+                if (peek(row + r, col + c).status == ROBOT) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
+
+int Map::kernelr (int row, int col) {
+    int yeet = 0;
+    for (int r = -3; r < 3; r++) {
+        for (int c = -3; c < 3; c++) {
+            if(in_og_range(row + r, col + c) && !comploc({row,col},{row + r, col + c})) {
+                if (peek(row + r, col + c).status == ROBOT) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
+
+int Map::kernelr (int row, int col, int size) {
+    int yeet = 0;
+    for (int r = -size; r < size; r++) {
+        for (int c = -size; c < size; c++) {
+            if(in_og_range(row + r, col + c) && !comploc({row,col},{row + r, col + c})) {
+                if (peek(row + r, col + c).status == ROBOT) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
 
 bool Map::update (Loc loc, Places p) {
     if (in_og_range(loc)) {
@@ -186,7 +249,6 @@ bool Map::update (Loc loc, Places p, int id) {
         if (p == TRASH) {
             cleared += 1;
             fields[loc.r][loc.c].tread -= 1;
-            
             for (int r = -2; r < 2; r++) {
                 for (int c = -2; c < 2; c++) {
                     if(in_og_range({loc.r + r,loc.c + c})) {
@@ -194,13 +256,7 @@ bool Map::update (Loc loc, Places p, int id) {
                     }
                 }
             }
-            /*for (int i = 0; i < 12; i++) {
-                if(in_og_range({loc.r + NEIGHBORS[i][0],loc.c + NEIGHBORS[i][1]})) {
-                    fields[loc.r + NEIGHBORS[i][0]][loc.c + NEIGHBORS[i][1]].tread -= 1;
-                }
-            }*/
         }
-
         if (prev == TRASH) {
             cleared -= 1;
             fields[loc.r][loc.c].tread = 0;
@@ -303,11 +359,27 @@ void Map::fixed (int id) {
 }
 
 bool Map::bots(Loc loc) {
-    return (peek(loc).status != ROBOT || peek(loc).status != DED);
+    return (peek(loc).status == ROBOT || peek(loc).status == DED);
 }
 
 bool Map::bots(int row, int col) {
-    return in_og_range(row,col) ? (peek(row,col).status != ROBOT || peek(row,col).status != DED) : false;
+    return in_og_range(row,col) ? (peek(row,col).status == ROBOT || peek(row,col).status == DED) : false;
+}
+
+bool Map::rbots(Loc loc) {
+    return peek(loc).status == ROBOT;
+}
+
+bool Map::rbots(int row, int col) {
+    return in_og_range(row,col) ? peek(row,col).status == ROBOT : false;
+}
+
+bool Map::dedbots(Loc loc) {
+    return peek(loc).status == DED;
+}
+
+bool Map::dedbots(int row, int col) {
+    return in_og_range(row,col) ? peek(row,col).status == DED : false;
 }
 
 int Map::clear () {

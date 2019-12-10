@@ -73,6 +73,10 @@ public:
     int kernel (Loc loc, int size);
     int kernel (int row, int col);
     int kernel (int row, int col, int size);
+    int kernelr (Loc loc);
+    int kernelr (Loc loc, int size);
+    int kernelr (int row, int col);
+    int kernelr (int row, int col, int size);
     bool update (Loc loc, Places p);
     bool update (Loc loc, Places p, int id);
     void treaded (Loc loc);
@@ -85,6 +89,10 @@ public:
     void fixed (int id);
     bool bots(Loc loc);
     bool bots(int row, int col);
+    bool rbots(Loc loc);
+    bool rbots(int row, int col);
+    bool dedbots(Loc loc);
+    bool dedbots(int row, int col);
     int clear ();
     int pile ();
     int ded ();
