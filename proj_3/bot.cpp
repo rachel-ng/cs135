@@ -164,17 +164,19 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 checkd[i] = map.kernel(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]);
             }
             if(i > 3 && i < 8 && map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == TRASH) {
+                // diagonals up
                 if ((i == 4 || i == 5) && (map.peek(row + NEIGHBORS[0][0], col + NEIGHBORS[0][1]).status == ROBOT)) {
                     check[i] = -1;
                     checkd[i] = -1;
                     map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
-                }   
+                }
+                // diagonals down
                 if ((i == 6 || i == 7) && (map.peek(row + NEIGHBORS[3][0], col + NEIGHBORS[3][1]).status == ROBOT)) {
                     check[i] = -1;
                     checkd[i] = -1;
                     map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
                 }   
-             }
+            }
             if(i > 7 && map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == TRASH && map.peek(row + NEIGHBORS[i - 8][0], col + NEIGHBORS[i - 8][1]).status == ROBOT) {
                 check[i] = -1;
                 checkd[i] = -1;
