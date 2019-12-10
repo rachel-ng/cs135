@@ -336,6 +336,10 @@ void Map::fix (Loc loc, int id) { // fix a robot
 void Map::fixer (int id, int fix) { // assign a fixer 
     robots[id].fixer = fix;
     robots[fix].fixing = id;
+    if (robots[id].fixer != -1) { 
+        robots[robots[id].fixer].fixing = -1;
+        broken -= 1;
+    }
     broken += 1;
 }
 
