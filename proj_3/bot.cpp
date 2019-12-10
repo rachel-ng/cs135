@@ -55,20 +55,30 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 
     map.update(loc, ROBOT,id);
 
-    for (int i = 0; i < 4; i++) {
-        if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
-            if (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status == DED) {
+    for (int i = 0; i < 8; i++) {
+        if (map.in_range({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]})) {
+            if (map.peek({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]}).status == DED) {
                 // fix broken robot if you're next to one
-                Field r = map.peek({row + ADJC[i][0],col + ADJC[i][1]});
-                map.update({row + ADJC[i][0],col + ADJC[i][1]},ROBOT,r.robot);
-                map.fixed(r.robot);
-                if (ADJC[i][0] != 0) {
-                    // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
-                    return ADJC[i][0] == -1 ? REPAIR_UP : REPAIR_DOWN; 
+                if (i < 4) {
+                    Field r = map.peek({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]});
+                    map.update({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]},ROBOT,r.robot);
+                    map.fixed(r.robot);
+                    if (NEIGHBORS[i][1] != 0) {
+                        // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
+                        return NEIGHBORS[i][1] == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
+                    }
+                    if (ADJC[i][0] != 0) {
+                        // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
+                        return NEIGHBORS[i][0] == -1 ? REPAIR_UP : REPAIR_DOWN; 
+                    }
                 }
-                else if (ADJC[i][1] != 0) {
-                    // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
-                    return ADJC[i][1] == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
+                else {
+                    switch(i) {
+                    case 4: return UP;
+                    case 5: return UP;
+                    case 6: return DOWN;
+                    default: return DOWN;
+                    }
                 }
             }
         }
@@ -185,12 +195,10 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             if (map.bots({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]})) {
                 map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
             }
-            if (check[i] != -1 && check[i] < check[move]) {
-                move = i;
-            }
-            if (checkd[i] != -1 && checkd[i] < checkd[move]) {
-                moved = i;
-            }
+            
+            move = check[i] != -1 && check[i] < check[move] ? i : move;
+            moved = checkd[i] != -1 && checkd[i] < checkd[move] ? i : moved;
+
             //check[i] = map.in_range(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) ?  map.kernel({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}) + ((12 - i) % 4): 0;
         }
         if (move != 12) { 
@@ -236,44 +244,18 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && !map.bots({row+1,col})) {
             return DOWN;
         }
-        /*else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
-            return RIGHT;
-        }
-        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
-            return LEFT;
-        }*/
  
         if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && !map.bots({row-1,col})) {
             return UP;
         }
-        /*else if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && map.bots({row,col+1})) {
-            return RIGHT;
-        }
-        else if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && map.bots({row,col-1})) {
-            return LEFT;
-        }*/
         
         if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && !map.bots({row,col+1})) {
             return RIGHT;
         }
-        /*else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
-            return DOWN;
-        }
-        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
-            return UP;
-        }*/
         
         if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && !map.bots({row,col-1})) {
             return LEFT;
-        }
-        /*else if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && map.bots({row+1,col})) {
-            return DOWN;
-        }
-        else if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && map.bots({row-1,col})) {
-            return UP;
-        }*/
-
-       
+        }       
 
         // choose the least treaded on field
         int best = -1;
