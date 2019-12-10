@@ -21,6 +21,7 @@ class Robot {
 public:
     Loc loc = {-1,-1};
     Loc ploc = {-1,-1}; // previous location 
+    Loc target = {-1,-1};
     bool dead = false;
     int id;
     int fixer = -1; // robot that will fix this
@@ -39,6 +40,14 @@ public:
         ploc = loc;
         loc = l;
         dead = d;
+    }
+    
+    int fixers () {
+        return fixer;
+    }
+
+    int fixings () {
+        return fixing;
     }
 };
 
@@ -59,6 +68,7 @@ class Map {
     int broken = 0;
 
 public:
+    std::vector<int> rip ();
     Map (int row, int col, int num);
     bool in_og_range (Loc loc);
     bool in_og_range (int r, int c);
@@ -67,14 +77,18 @@ public:
     Robot locate (int id);
     Field peek (int row, int col);
     Field peek (Loc loc);
+    int check_u (Loc loc);
+    int check_d (Loc loc);
+    int check_l (Loc loc);
+    int check_r (Loc loc);
+    int check_u (Loc loc, int rows, int cols);
+    int check_d (Loc loc, int rows, int cols);
+    int check_l (Loc loc, int rows, int cols);
+    int check_r (Loc loc, int rows, int cols);
     int kernel (Loc loc);
     int kernel (Loc loc, int size);
-    int kernel (int row, int col);
-    int kernel (int row, int col, int size);
     int kernelr (Loc loc);
     int kernelr (Loc loc, int size);
-    int kernelr (int row, int col);
-    int kernelr (int row, int col, int size);
     bool update (Loc loc, Places p);
     bool update (Loc loc, Places p, int id);
     void treaded (Loc loc);
@@ -83,6 +97,7 @@ public:
     void set_default();
     void fix ();
     void fix (Loc loc, int id);
+    void fix (Loc loc, int id, bool force);
     void fixer (int id, int fix);
     void fixed (int id);
     bool bots(Loc loc);
