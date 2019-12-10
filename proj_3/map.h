@@ -20,17 +20,17 @@ public:
 class Robot {
 public:
     Loc loc = {-1,-1};
-    Loc ploc = {-1,-1};
+    Loc ploc = {-1,-1}; // previous location 
     bool dead = false;
     int id;
     int fixer = -1; // robot that will fix this
     int fixing = -1; // will fix this robot
     
-    Robot (int i) {
+    Robot (int i) { // set up robots 
         id = i;
     }
     
-    void update (Loc l) {
+    void update (Loc l) { 
         ploc = loc;
         loc = l;
     }
@@ -41,8 +41,6 @@ public:
         dead = d;
     }
 };
-
-
 
 class Map {
     std::vector<std::vector <Field> > fields;

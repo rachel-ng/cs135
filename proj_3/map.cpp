@@ -1,14 +1,11 @@
 #include "map.h"
 
-double manhattanDist(Loc start, Loc target) {
+double manhattanDist(Loc start, Loc target) { // manhattan distance 
     return abs(start.c-target.c) + abs(start.r-target.r);
 }
 
-bool comploc (Loc a, Loc b) {
-    if (a.r == b.r && a.c == b.c) {
-        return true;
-    }
-    return false;
+bool comploc (Loc a, Loc b) { // compare locations 
+    return (a.r == b.r && a.c == b.c) ? true : false;
 }
 
 Map::Map (int row, int col, int num) {
@@ -60,7 +57,7 @@ Field Map::peek (Loc loc) {
     return {UNDEF, {-1,-1}, false, -1, -1, -1};
 }   
 
-int Map::kernel (Loc loc) {
+int Map::kernel (Loc loc) { // checks debris of specified kernel 
     int yeet = 0;
     //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
     int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
@@ -78,7 +75,7 @@ int Map::kernel (Loc loc) {
     return yeet;
 }
 
-int Map::kernel (Loc loc, int size) {
+int Map::kernel (Loc loc, int size) {  // checks debris of specified kernel
     int yeet = 0;
     //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
     int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
@@ -96,7 +93,7 @@ int Map::kernel (Loc loc, int size) {
     return yeet;
 }
 
-int Map::kernel (int row, int col) {
+int Map::kernel (int row, int col) {  // checks debris of specified kernel
     int yeet = 0;
     for (int r = -3; r < 3; r++) {
         for (int c = -3; c < 3; c++) {
@@ -110,7 +107,7 @@ int Map::kernel (int row, int col) {
     return yeet;
 }
 
-int Map::kernel (int row, int col, int size) {
+int Map::kernel (int row, int col, int size) {  // checks debris of specified kernel
     int yeet = 0;
     for (int r = -size; r < size; r++) {
         for (int c = -size; c < size; c++) {
@@ -124,7 +121,7 @@ int Map::kernel (int row, int col, int size) {
     return yeet;
 }
 
-int Map::kernelr (Loc loc) {
+int Map::kernelr (Loc loc) {  // checks robots of specified kernel
     int yeet = 0;
     //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
     int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
@@ -142,7 +139,7 @@ int Map::kernelr (Loc loc) {
     return yeet;
 }
 
-int Map::kernelr (Loc loc, int size) {
+int Map::kernelr (Loc loc, int size) {  // checks robots of specified kernel
     int yeet = 0;
     //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
     int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
@@ -160,7 +157,7 @@ int Map::kernelr (Loc loc, int size) {
     return yeet;
 }
 
-int Map::kernelr (int row, int col) {
+int Map::kernelr (int row, int col) { // checks robots of specified kernel
     int yeet = 0;
     for (int r = -3; r < 3; r++) {
         for (int c = -3; c < 3; c++) {
@@ -174,7 +171,7 @@ int Map::kernelr (int row, int col) {
     return yeet;
 }
 
-int Map::kernelr (int row, int col, int size) {
+int Map::kernelr (int row, int col, int size) { // checks robots of specified kernel
     int yeet = 0;
     for (int r = -size; r < size; r++) {
         for (int c = -size; c < size; c++) {
@@ -223,11 +220,11 @@ bool Map::update (Loc loc, Places p) {
             return true;
         }
         
+        // do bounding 
         if(loc.r > BOUND_R || loc.r <= BOUND_RB) {
             bound_r(); 
             bound_rb(); 
         }
-
         if(loc.c > BOUND_C || loc.c <= BOUND_CB) {
             bound_c();
             bound_cb();
@@ -257,7 +254,7 @@ bool Map::update (Loc loc, Places p, int id) {
                 }
             }
         }
-        if (prev == TRASH) {
+        if (prev == TRASH) { 
             cleared -= 1;
             fields[loc.r][loc.c].tread = 0;
             fields[loc.r][loc.c].dead = 1;
@@ -267,16 +264,16 @@ bool Map::update (Loc loc, Places p, int id) {
             fields[loc.r][loc.c].tread += 1;
             fields[loc.r][loc.c].dead += 1;
         }
-        else if (p == ROBOT) {
+        else if (p == ROBOT) { // update robot locations 
             robots[id].update(loc);
             fields[loc.r][loc.c].tread += 2;
             fields[loc.r][loc.c].dead += 1;
             fields[loc.r][loc.c].robot = id;
         }
-        else if (p == DED) {
+        else if (p == DED) { // update dead robots 
             robots[id].update(loc, true);
             fields[loc.r][loc.c].robot= id;
-            dead.push_back(id);
+            dead.push_back(id); 
         }
 
         if (p!= TRASH && (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB)) { 
@@ -284,11 +281,11 @@ bool Map::update (Loc loc, Places p, int id) {
             return true;
         }
 
+        // do bounding 
         if(loc.r > BOUND_R || loc.r <= BOUND_RB) {
             bound_r(); 
             bound_rb(); 
         }
-
         if(loc.c > BOUND_C || loc.c <= BOUND_CB) {
             bound_c();
             bound_cb();
@@ -299,22 +296,25 @@ bool Map::update (Loc loc, Places p, int id) {
     return false;
 }
 
-void Map::fix () {
+void Map::fix () { // check for robots that need fixing 
     for (int i = 0; i < dead.size(); i++) {
         if (locate(dead[i]).fixer == -1) {
             fix(locate(dead[i]).loc, dead[i]);
+            return;
         }
     }
 }
 
-void Map::fix (Loc loc, int id) {
+void Map::fix (Loc loc, int id) { // fix a robot 
     if (locate(id).fixer != -1) {
         return;
     }
+    // change status to dead
     update(loc,DED,id);
-    if (locate(id).fixing != -1) {
+    if (locate(id).fixing != -1) { // assigns new fixer to the robot this was supposed to be fixing (if available)
         fix(locate(id).loc, locate(id).fixing);
     }
+    // find closest robot and assign to fix this one 
     int min = ROWS * COLS;
     int f = -1;
     for (int i = 0; i < NUM; i++) {
@@ -325,7 +325,7 @@ void Map::fix (Loc loc, int id) {
             }
         }
     }
-    if (f == -1) {
+    if (f == -1) { // if no fixers available 
         return;
     }
     else {
@@ -333,19 +333,19 @@ void Map::fix (Loc loc, int id) {
 	}
 } 
 
-void Map::fixer (int id, int fix) {
+void Map::fixer (int id, int fix) { // assign a fixer 
     robots[id].fixer = fix;
     robots[fix].fixing = id;
     broken += 1;
 }
 
-void Map::fixed (int id) {
-    int fix = robots[id].fixer;
-    robots[fix].fixing = -1;
+void Map::fixed (int id) { // upon fixing a robot  
+    int f = robots[id].fixer;
+    robots[f].fixing = -1;
     robots[id].fixer = -1;
     robots[id].dead = false;
     broken -= 1;
-    if (dead.size() > 1) {;
+    if (dead.size() > 1) { // takes the robot out of the fix list 
         for (int i = 0; i < dead.size(); i++) {
             if (dead[i] == id) {
                 dead[i] = dead[dead.size()-1];
@@ -356,29 +356,30 @@ void Map::fixed (int id) {
     else {
         dead.pop_back();
     }
+    fix(); // check if there are any robots that still need to be fixed 
 }
 
-bool Map::bots(Loc loc) {
+bool Map::bots(Loc loc) { // if alive or dead robots 
     return (peek(loc).status == ROBOT || peek(loc).status == DED);
 }
 
-bool Map::bots(int row, int col) {
+bool Map::bots(int row, int col) { // if alive or dead robots 
     return in_og_range(row,col) ? (peek(row,col).status == ROBOT || peek(row,col).status == DED) : false;
 }
 
-bool Map::rbots(Loc loc) {
+bool Map::rbots(Loc loc) { // if alive robots 
     return peek(loc).status == ROBOT;
 }
 
-bool Map::rbots(int row, int col) {
+bool Map::rbots(int row, int col) { // if alive robots 
     return in_og_range(row,col) ? peek(row,col).status == ROBOT : false;
 }
 
-bool Map::dedbots(Loc loc) {
+bool Map::dedbots(Loc loc) { // if dead robots 
     return peek(loc).status == DED;
 }
 
-bool Map::dedbots(int row, int col) {
+bool Map::dedbots(int row, int col) { // if dead robots 
     return in_og_range(row,col) ? peek(row,col).status == DED : false;
 }
 
@@ -406,6 +407,7 @@ void Map::deaded (Loc loc) {
     fields[loc.r][loc.c].dead += 1;
 }
 
+// fixes upper bounds 
 void Map::bound_r() {
     bool rip = true;
     for (int i = BOUND_R; i < BOUND_RB; i++) {
@@ -415,7 +417,7 @@ void Map::bound_r() {
                 break;
             }
         }
-        if (rip) {
+        if (rip) { // adjust bound 
             BOUND_R = i;
         }
         else {
@@ -424,6 +426,7 @@ void Map::bound_r() {
     }
 }
 
+// fixes left bounds 
 void Map::bound_c() {
     bool rip = true;
     for (int i = BOUND_C; i < BOUND_CB; i++) {
@@ -433,7 +436,7 @@ void Map::bound_c() {
                 break;
             }
         }
-        if (rip) {
+        if (rip) { // adjust bound 
             BOUND_C = i;
         }
         else {
@@ -442,6 +445,7 @@ void Map::bound_c() {
     }
 }
 
+// fixes lower bounds 
 void Map::bound_rb() {
     for (int i = BOUND_RB-1; i >= BOUND_R; i--) {
         bool rip = true;
@@ -451,7 +455,7 @@ void Map::bound_rb() {
                 break;
             }
         }
-        if (rip) {
+        if (rip) { // adjust bound 
             BOUND_RB = i;
         }
         else {
@@ -460,6 +464,7 @@ void Map::bound_rb() {
     }
 }
 
+// fixes right bounds 
 void Map::bound_cb() {
     for (int i = BOUND_CB-1; i >= BOUND_C; i--) {
         bool rip = true;
@@ -469,7 +474,7 @@ void Map::bound_cb() {
                 break;
             }
         }
-        if (rip) {
+        if (rip) { // adjust bound 
             BOUND_CB = i;
         }
         else {
@@ -478,18 +483,18 @@ void Map::bound_cb() {
     }
 }
 
-int Map::b_r() {
+int Map::b_r() { // upper bound 
     return BOUND_R;
 }
 
-int Map::b_c() {
+int Map::b_c() { // left bound 
     return BOUND_C;
 }
 
-int Map::b_rb() {
+int Map::b_rb() { // lower bound 
     return BOUND_RB;
 }
 
-int Map::b_cb() {
+int Map::b_cb() { // right bound 
     return BOUND_CB;
 }

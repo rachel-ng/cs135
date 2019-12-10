@@ -26,20 +26,13 @@ void onStart(int num, int rows, int cols, double mpr,
 	ROWS = rows;
 	COLS = cols;
     
+    // set up map 
     map = Map(ROWS,COLS,NUM);
-    
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < COLS; c++) {
             map.update({r,c},area.inspect(r,c) == DEBRIS ? TRASH : EMPT);
-            /*if (area.inspect(r,c) != DEBRIS) { 
-                map.update({r,c},EMPT);
-            }
-            if (area.inspect(r,c) == DEBRIS) { 
-                map.update({r,c},TRASH);
-            }*/
         }
     }
-    
     for (int i = 0; i < NUM; i++) {
         map.update(area.locate(i), ROBOT, i); 
         //log << i << "\t" << area.locate(i).r << ", " << area.locate(i).c << endl;
@@ -54,36 +47,27 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 	int col = loc.c;
 
     map.update(loc, ROBOT,id);
-
-    for (int i = 0; i < 8; i++) {
-        if (map.in_range({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]})) {
-            if (map.peek({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]}).status == DED) {
+    /*
+    for (int i = 0; i < 4; i++) {
+        if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
+            if (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status == DED) {
                 // fix broken robot if you're next to one
-                if (i < 4) {
-                    Field r = map.peek({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]});
-                    map.update({row + NEIGHBORS[i][0],col + NEIGHBORS[i][1]},ROBOT,r.robot);
-                    map.fixed(r.robot);
-                    if (NEIGHBORS[i][1] != 0) {
-                        // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
-                        return NEIGHBORS[i][1] == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
-                    }
-                    if (ADJC[i][0] != 0) {
-                        // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
-                        return NEIGHBORS[i][0] == -1 ? REPAIR_UP : REPAIR_DOWN; 
-                    }
+                Field r = map.peek({row + ADJC[i][0],col + ADJC[i][1]});
+                map.fixed(r.robot);
+                map.update({row + ADJC[i][0],col + ADJC[i][1]},ROBOT,r.robot);
+                if (ADJC[i][1] != 0) {
+                    // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
+                    return ADJC[i][1] == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
                 }
-                else {
-                    switch(i) {
-                    case 4: return UP;
-                    case 5: return UP;
-                    case 6: return DOWN;
-                    default: return DOWN;
-                    }
+                if (ADJC[i][0] != 0) {
+                    // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
+                    return ADJC[i][0] == -1 ? REPAIR_UP : REPAIR_DOWN; 
                 }
             }
         }
     }
-    
+    */
+  
     if (map.locate(id).dead) {
         // dead robots don't move
 		if (map.locate(id).fixer == -1) {
@@ -100,6 +84,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         Robot r = map.locate(map.locate(id).fixing);
         int target_r = r.loc.r;
         int target_c = r.loc.c;
+        // preferred directions
         int pref_r = target_r < row ? -1 : 1;
         int pref_c = target_c < col ? -1 : 1;
         pref_r = target_r == row ? 0 : pref_r;
@@ -159,9 +144,9 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		}
     }
     else {
-
         map.update(loc,EMPT);
         
+        // set up for kernel checking 
         int check [13] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, ROWS * COLS};
         int checkd [13] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1};
 
@@ -201,7 +186,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 
             //check[i] = map.in_range(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]) ?  map.kernel({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}) + ((12 - i) % 4): 0;
         }
-        if (move != 12) { 
+        // less debris 
+        if (moved != 12) { 
             switch(move) {
             case 0: return UP;
             case 1: return LEFT;
@@ -217,7 +203,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             default: return DOWN;
             }
         }
-        if (moved != 12) { 
+        // less robots 
+        if (move != 12) { 
             switch(move) {
             case 0: return UP;
             case 1: return LEFT;
@@ -244,15 +231,12 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && !map.bots({row+1,col})) {
             return DOWN;
         }
- 
         if (row >= map.b_rb() && map.in_range({map.b_rb() - 1,col}) && !map.bots({row-1,col})) {
             return UP;
         }
-        
         if (col <= map.b_c() && map.in_range({row,map.b_c() + 1}) && !map.bots({row,col+1})) {
             return RIGHT;
         }
-        
         if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && !map.bots({row,col-1})) {
             return LEFT;
         }       
@@ -261,7 +245,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         int best = -1;
         int bestv = ROWS * COLS;
         for (int i = 0; i < 4; i++) {
-            if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]}) && map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status != ROBOT) {
+            if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]}) && !map.rbots({row + ADJC[i][0],col + ADJC[i][1]})) {
                 // bonus for previous locations + nearby robots 
                 int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.locate(id).ploc) ? (NUM) : 0;
                 for (int i = 0; i < 12; i++) {
@@ -269,10 +253,9 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                         robonus += map.peek(row + ADJC[i][0] + NEIGHBORS[i][0], col + ADJC[i][1] + NEIGHBORS[i][1]).status == ROBOT ? (NUM / floor(i/3)) : 0;
                     }
                 }
-                
+                // the calculations for least treaded 
                 best = map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? i : best;
                 bestv =  map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus : bestv;
-            
             }
             else if (row+ADJC[i][0] <= map.b_r()-1 && !map.bots({row + ADJC[i][0],col + ADJC[i][1]})) {
                 return DOWN;
@@ -307,7 +290,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
     // map fix function
     map.fix(loc,id);
-    log << "Robot " << map.locate(id).fixer << " to fix " << id << "\t("<< loc.r << ", " << loc.c << ")" << "\t" << map.ded()<< endl;
+    //log << "Robot " << map.locate(id).fixer << " to fix " << id << "\t("<< loc.r << ", " << loc.c << ")" << "\t" << map.ded()<< endl;
 }
 
 void onClockTick(int time, ostream &log) {
