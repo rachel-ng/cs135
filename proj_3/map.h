@@ -58,6 +58,7 @@ class Map {
     int ROWS;
     int COLS;
     int NUM;
+    int NUMRT;
     int BOUND_R = 0;
     int BOUND_C = 0;
     int BOUND_RB;

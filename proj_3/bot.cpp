@@ -1,3 +1,11 @@
+/*
+Author: Rachel Ng 
+Course: CSCI-135
+Instructor: Maryash
+Assignment: Project 3
+
+the boi
+*/
 
 #include <cstdlib>
 #include <iostream>
@@ -47,26 +55,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 	int col = loc.c;
 
     map.update(loc, ROBOT,id);
-    /*
-    for (int i = 0; i < 4; i++) {
-        if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
-            if (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status == DED) {
-                // fix broken robot if you're next to one
-                Field r = map.peek({row + ADJC[i][0],col + ADJC[i][1]});
-                map.fixed(r.robot);
-                map.update({row + ADJC[i][0],col + ADJC[i][1]},ROBOT,r.robot);
-                if (ADJC[i][1] != 0) {
-                    // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
-                    return ADJC[i][1] == -1 ? REPAIR_LEFT : REPAIR_RIGHT; 
-                }
-                if (ADJC[i][0] != 0) {
-                    // log << "Robot " << id << " fixed " << r.robot << "\t("<< r.loc.r << ", " << r.loc.c << ")" << "\t" << map.ded()<< endl;
-                    return ADJC[i][0] == -1 ? REPAIR_UP : REPAIR_DOWN; 
-                }
-            }
-        }
-    }
-    */
 
     if(map.locate(id).fixing == -1 && !map.locate(id).dead) {
         for (int i = 0; i < 4; i++) {
@@ -178,15 +166,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         if ((!map.rbots({row + ADJC[0][0],col + ADJC[0][1]}) && map.rbots({row + ADJC[1][0],col + ADJC[1][1]}) && map.rbots({row + ADJC[2][0],col + ADJC[2][1]}) && map.rbots({row + ADJC[3][0],col + ADJC[3][1]})) || (map.check_d(loc,1,1) > 2 && !map.bots({loc.r - 1, loc.c}))) {
             return UP;
         }
-
-        /*for (int i = 0; i < 4; i++) {
-            if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]})) {
-                if (map.peek({row + ADJC[i][0],col + ADJC[i][1]}).status == DED) {
-                    //map.fixed(map.peek({row + ADJC[i][0],col + ADJC[i][1]}).robot);
-                    map.fix({row + ADJC[i][0],col + ADJC[i][1]},map.peek({row + ADJC[i][0],col + ADJC[i][1]}).robot, true);
-                }
-            }
-        }*/
         
         // set up for kernel checking 
         int check [13] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, ROWS * COLS};
@@ -338,7 +317,7 @@ void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
 
 void onClockTick(int time, ostream &log) {
 	if (time % 50 == 0) {
-        //log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << map.b_rb() << ", " << map.b_cb()<< "\t" <<  map.clear() << " / " << map.pile() << endl;
+        log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << map.b_rb() << ", " << map.b_cb()<< "\t" <<  map.clear() << " / " << map.pile() << endl;
         //for(int i = 0; i < map.rip().size(); i++) {
         //    log << map.rip()[i] << " (" << map.locate(i).fixers() << ", " <<  map.locate(i).fixings() << ")" << ", ";
         //}

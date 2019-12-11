@@ -1,3 +1,4 @@
+#include <cmath>
 #include "map.h"
 
 double manhattanDist(Loc start, Loc target) { // manhattan distance 
@@ -16,6 +17,7 @@ Map::Map (int row, int col, int num) {
     ROWS = row;
     COLS = col;
     NUM = num;
+    NUMRT = sqrt(NUM);
     BOUND_CB  = COLS;
     BOUND_RB = ROWS;
     piles = ROWS * COLS;
@@ -512,7 +514,7 @@ void Map::bound_r() {
                 break;
             }
         }
-        if (rip) { // adjust bound 
+        if (rip && BOUND_RB-BOUND_R > NUMRT) { // adjust bound 
             BOUND_R = i;
         }
         else {
@@ -531,7 +533,7 @@ void Map::bound_c() {
                 break;
             }
         }
-        if (rip) { // adjust bound 
+        if (rip && BOUND_CB-BOUND_C > NUMRT) { // adjust bound 
             BOUND_C = i;
         }
         else {
@@ -550,7 +552,7 @@ void Map::bound_rb() {
                 break;
             }
         }
-        if (rip) { // adjust bound 
+        if (rip && BOUND_RB-BOUND_R > NUMRT) { // adjust bound 
             BOUND_RB = i;
         }
         else {
@@ -569,7 +571,7 @@ void Map::bound_cb() {
                 break;
             }
         }
-        if (rip) { // adjust bound 
+        if (rip && BOUND_CB-BOUND_C > NUMRT) { // adjust bound 
             BOUND_CB = i;
         }
         else {
