@@ -170,25 +170,25 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             if(map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == TRASH) {
                 check[i] = map.kernelr({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3});
                 checkd[i] = map.kernel({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3});
-            }
-            if(i > 3 && i < 8 && map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == TRASH) {
-                // diagonals up
-                if ((i == 4 || i == 5) && (map.peek(row + NEIGHBORS[0][0], col + NEIGHBORS[0][1]).status == ROBOT)) {
+                if(i > 3 && i < 8) {
+                    // diagonals up
+                    if ((i == 4 || i == 5) && (map.peek(row + NEIGHBORS[0][0], col + NEIGHBORS[0][1]).status == ROBOT)) {
+                        check[i] = -1;
+                        checkd[i] = -1;
+                        map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
+                    }
+                    // diagonals down
+                    if ((i == 6 || i == 7) && (map.peek(row + NEIGHBORS[3][0], col + NEIGHBORS[3][1]).status == ROBOT)) {
+                        check[i] = -1;
+                        checkd[i] = -1;
+                        map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
+                    }   
+                }
+                if(i > 7 && map.peek(row + NEIGHBORS[i - 8][0], col + NEIGHBORS[i - 8][1]).status == ROBOT) {
                     check[i] = -1;
                     checkd[i] = -1;
                     map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
                 }
-                // diagonals down
-                if ((i == 6 || i == 7) && (map.peek(row + NEIGHBORS[3][0], col + NEIGHBORS[3][1]).status == ROBOT)) {
-                    check[i] = -1;
-                    checkd[i] = -1;
-                    map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
-                }   
-            }
-            if(i > 7 && map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == TRASH && map.peek(row + NEIGHBORS[i - 8][0], col + NEIGHBORS[i - 8][1]).status == ROBOT) {
-                check[i] = -1;
-                checkd[i] = -1;
-                map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
             }
             if (map.bots({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]})) {
                 map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
@@ -267,45 +267,36 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         
         // if it's out of bounds it continues to move until it's no longer out of bounds
         if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && !map.bots({row+1,col})) {
-            if (map.in_range({map.b_r()+1,col+1}) && map.in_range({map.b_r()+1,col-1})) {
-                switch(rand() % 3) {
-                case 1: return LEFT;
-                case 2: return RIGHT;
-                default: return DOWN;
-                }
-            }
             return DOWN;
         }
         if (row >= map.b_rb() && map.in_range({map.b_rb()-1,col}) && !map.bots({row-1,col})) {
-            if (map.in_range({map.b_rb()-1,col+1}) && map.in_range({map.b_rb()-1,col-1})) {
-                switch(rand() % 3) {
-                case 1: return LEFT;
-                case 2: return RIGHT;
-                default: return UP;
-                }
-            }
             return UP;
         }
         if (col <= map.b_c() && map.in_range({row,map.b_c()+1}) && !map.bots({row,col+1})) {
-            if (map.in_range({row-1,map.b_c()+1}) && map.in_range({row+1,map.b_c()+1})) {
-                switch(rand() % 3) {
-                case 1: return UP;
-                case 2: return DOWN;
-                default: return RIGHT;
-                }
-            }
             return RIGHT;
         }
         if (col >= map.b_cb() && map.in_range({row,map.b_cb() - 1}) && !map.bots({row,col-1})) {
-            if (map.in_range({row-1,map.b_cb()-1}) && map.in_range({row+1,map.b_cb()-1})) {
-                switch(rand() % 3) {
-                case 1: return UP;
-                case 2: return DOWN;
-                default: return LEFT;
-                }
-            }
             return LEFT;
         }       
+        /*
+        int close = -1;
+        int closev = ROWS * COLS;
+        for (int i = 0; i < 12; i++) {
+            if(map.in_range(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1])) {
+                int su = map.kernel({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3}) - map.kernelr({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3});
+                close = su < closev ? i : close;
+                closev =  su < closev ? su: closev;
+            }
+        }
+        if (closev > 0 && close != -1) {
+            switch(close) { 
+            case 0: return UP;
+            case 1: return LEFT;
+            case 2: return RIGHT;
+            default: return DOWN;
+            }
+        }
+        */
 
         // choose the least treaded on field
         int best = -1;
@@ -313,12 +304,14 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         for (int i = 0; i < 4; i++) {
             if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]}) && !map.rbots({row + ADJC[i][0],col + ADJC[i][1]})) {
                 // bonus for previous locations + nearby robots 
-                int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.locate(id).ploc) ? (NUM) : 0;
-                for (int i = 0; i < 12; i++) {
+                int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.locate(id).ploc) ? (NUM * 2) : 0;
+                /*for (int i = 0; i < 12; i++) {
                     if (map.in_range({row + ADJC[i][0] + NEIGHBORS[i][0], col + ADJC[i][1] + NEIGHBORS[i][1]})) {
                         robonus += map.peek(row + ADJC[i][0] + NEIGHBORS[i][0], col + ADJC[i][1] + NEIGHBORS[i][1]).status == ROBOT ? (NUM / floor(i/3)) : 0;
                     }
-                }
+                }*/
+                robonus += map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) * NUM;
+
                 // the calculations for least treaded 
                 best = map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? i : best;
                 bestv =  map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus : bestv;
