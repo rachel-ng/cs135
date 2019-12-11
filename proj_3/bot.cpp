@@ -311,17 +311,12 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 void onRobotMalfunction(int id, Loc loc, Area &area, ostream &log) {
     // map fix function
     map.fix(loc,id);
-
     //log << "Robot " << map.locate(id).fixer << " to fix " << id << "\t("<< loc.r << ", " << loc.c << ")" << "\t" << map.ded()<< endl;
 }
 
 void onClockTick(int time, ostream &log) {
 	if (time % 50 == 0) {
         log << time << "\t" << map.b_r() << ", " << map.b_c() << "\t" << map.b_rb() << ", " << map.b_cb()<< "\t" <<  map.clear() << " / " << map.pile() << endl;
-        //for(int i = 0; i < map.rip().size(); i++) {
-        //    log << map.rip()[i] << " (" << map.locate(i).fixers() << ", " <<  map.locate(i).fixings() << ")" << ", ";
-        //}
-        //log << endl;
     }
     
 }
