@@ -490,8 +490,6 @@ int Map::ded () {
     return dead.size();
 }
 
-
-
 void Map::treaded (Loc loc) {
     fields[loc.r][loc.c].tread += 1;
 }
