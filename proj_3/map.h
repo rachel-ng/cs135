@@ -37,10 +37,14 @@ class Map {
     std::vector<std::vector <Field> > fields;
     std::vector<Robot> robots; 
     std::vector<int> dead; 
+    std::vector<bool> claim; 
     int ROWS;
     int COLS;
     int NUM;
     int NUMRT;
+    int RSIZE;
+    int CSIZE;
+    int KSIZE;
     int BOUND_R = 0;
     int BOUND_C = 0;
     int BOUND_RB;
@@ -84,6 +88,7 @@ public:
     void fixer (int id, int fix);
     void fixed (int id);
     void nearest (int id);
+    void unclaim (int id);
     bool bots(Loc loc);
     bool bots(int row, int col);
     bool rbots(Loc loc);

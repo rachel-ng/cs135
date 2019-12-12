@@ -51,6 +51,10 @@ Map::Map (int row, int col, int num) {
     for (int i = 0; i < NUM; i++) {
         robots[i] = Robot(i);
     }
+    RSIZE = ROWS / NUMRT;
+    CSIZE = COLS / NUMRT;
+    KSIZE = RSIZE > CSIZE ? RSIZE : CSIZE;
+    claim.resize(RSIZE * CSIZE + 1,false);
 }
 
 bool Map::in_og_range (Loc loc) {
@@ -483,14 +487,29 @@ void Map::fixed (int id) { // upon fixing a robot
 
 void Map::nearest (int id) {
     Loc loc = robots[id].loc;
-    double b[5] = {manhattanDist({BOUND_R - loc.r,BOUND_C - loc.c},loc), manhattanDist({BOUND_RB - loc.r,BOUND_C - loc.c},loc), manhattanDist({BOUND_R - loc.r,BOUND_CB - loc.c},loc), manhattanDist({BOUND_RB - loc.r,BOUND_CB - loc.c},loc), ROWS * COLS * 1.1};
+    /*double b[5] = {manhattanDist({BOUND_R - loc.r,BOUND_C - loc.c},loc), manhattanDist({BOUND_RB - loc.r,BOUND_C - loc.c},loc), manhattanDist({BOUND_R - loc.r,BOUND_CB - loc.c},loc), manhattanDist({BOUND_RB - loc.r,BOUND_CB - loc.c},loc), ROWS * COLS * 1.1};
     Loc l[5] = {{BOUND_R + 4, BOUND_C + 4}, {BOUND_R + 4, BOUND_CB - 4}, {BOUND_RB - 4, BOUND_C + 4}, {BOUND_RB - 4, BOUND_CB - 4}, {BOUND_R + 4, BOUND_C + 4}};
     int k[5] = {kernel(l[0],5),kernel(l[1],5),kernel(l[2],5),kernel(l[3],5), -10000};
     int best = 4;
     for (int i = 1; i < 4; i++) {
         best = b[best] < b[i] && k[i] > k[best]? i : best;
+    }*/
+    Loc best = loc;
+    int bestd = RSIZE * CSIZE;
+    int bestk = -1000;
+    for (int r = BOUND_R; r < BOUND_RB; r++) {
+        for (int c = BOUND_C; c < BOUND_CB; c++) {
+            if (in_range(r,c)) {
+                Loc l = {r,c};
+                best = fields[r][c].covered && bestd > manhattanDist(loc,l) && bestk > kernel(l) - kernelr(l) ? l : best;
+            }
+        }
     }
-    robots[id].target = l[best];
+    robots[id].target = best;
+}
+
+void Map::unclaim (int id) {
+    robots[id].target = {-1,-1};
 }
 
 bool Map::bots(Loc loc) { // if alive or dead robots 
