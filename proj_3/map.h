@@ -7,8 +7,7 @@
 
 enum Places {EMPT, TRASH, UNDEF, ROBOT, DED};
 
-class Field {
-public:
+struct Field {
     Places status;
     Loc loc;
     bool covered;
@@ -27,28 +26,11 @@ public:
     int fixer = -1; // robot that will fix this
     int fixing = -1; // will fix this robot
     
-    Robot (int i) { // set up robots 
-        id = i;
-    }
-    
-    void update (Loc l) { 
-        ploc = loc;
-        loc = l;
-    }
-    
-    void update (Loc l, bool d) {
-        ploc = loc;
-        loc = l;
-        dead = d;
-    }
-    
-    int fixers () {
-        return fixer;
-    }
-
-    int fixings () {
-        return fixing;
-    }
+    Robot(int);
+    void update(Loc l);
+    void update(Loc l, bool d);
+    int fixers(); 
+    int fixings();
 };
 
 class Map {
@@ -101,6 +83,7 @@ public:
     void fix (Loc loc, int id, bool force);
     void fixer (int id, int fix);
     void fixed (int id);
+    void nearest (int id);
     bool bots(Loc loc);
     bool bots(int row, int col);
     bool rbots(Loc loc);

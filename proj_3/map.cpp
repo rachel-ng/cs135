@@ -1,12 +1,37 @@
 #include <cmath>
 #include "map.h"
 
+const int ADJC[4][2] = {{-1,0},{0,-1},{0,1},{1,0}};
+
 double manhattanDist(Loc start, Loc target) { // manhattan distance 
     return abs(start.c-target.c) + abs(start.r-target.r);
 }
 
 bool comploc (Loc a, Loc b) { // compare locations 
     return (a.r == b.r && a.c == b.c) ? true : false;
+}
+
+Robot::Robot (int i) { // set up robots 
+    id = i;
+}
+
+void Robot::update (Loc l) { 
+    ploc = loc;
+    loc = l;
+}
+
+void Robot::update (Loc l, bool d) {
+    ploc = loc;
+    loc = l;
+    dead = d;
+}
+
+int Robot::fixers () {
+    return fixer;
+}
+
+int Robot::fixings () {
+    return fixing;
 }
 
 std::vector<int> Map::rip () {
@@ -431,6 +456,8 @@ void Map::fix (Loc loc, int id, bool force) { // fix a robot
 void Map::fixer (int id, int fix) { // assign a fixer 
     robots[id].fixer = fix;
     robots[fix].fixing = id;
+    robots[id].target = {-1,-1};
+    robots[fix].target = {-1,-1};
     broken += 1;
 }
 
@@ -452,6 +479,18 @@ void Map::fixed (int id) { // upon fixing a robot
         dead.pop_back();
     }
     fix(); // check if there are any robots that still need to be fixed 
+}
+
+void Map::nearest (int id) {
+    Loc loc = robots[id].loc;
+    double b[5] = {manhattanDist({BOUND_R - loc.r,BOUND_C - loc.c},loc), manhattanDist({BOUND_RB - loc.r,BOUND_C - loc.c},loc), manhattanDist({BOUND_R - loc.r,BOUND_CB - loc.c},loc), manhattanDist({BOUND_RB - loc.r,BOUND_CB - loc.c},loc), ROWS * COLS * 1.1};
+    Loc l[5] = {{BOUND_R + 4, BOUND_C + 4}, {BOUND_R + 4, BOUND_CB - 4}, {BOUND_RB - 4, BOUND_C + 4}, {BOUND_RB - 4, BOUND_CB - 4}, {BOUND_R + 4, BOUND_C + 4}};
+    int k[5] = {kernel(l[0],5),kernel(l[1],5),kernel(l[2],5),kernel(l[3],5), -10000};
+    int best = 4;
+    for (int i = 1; i < 4; i++) {
+        best = b[best] < b[i] && k[i] > k[best]? i : best;
+    }
+    robots[id].target = l[best];
 }
 
 bool Map::bots(Loc loc) { // if alive or dead robots 
