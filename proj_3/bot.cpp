@@ -78,6 +78,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		return COLLECT;
 	}
     else if (map.locate(id).fixing != -1) {
+        fix:
         // targeting a broken robot
         Robot r = map.locate(map.locate(id).fixing);
         int target_r = r.loc.r;
@@ -104,23 +105,30 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 
         if (map.rbots({row + ADJC[0][0],col + ADJC[0][1]}) && map.rbots({row + ADJC[1][0],col + ADJC[1][1]}) && map.rbots({row + ADJC[2][0],col + ADJC[2][1]}) && map.rbots({row + ADJC[3][0],col + ADJC[3][1]})) {
             map.fix(r.loc,r.id, true);
-            return COLLECT;
+            return LEFT;
         }
+
+        /*if (comploc(loc, map.locate(id).ploc)) {
+            map.fix(r.loc,r.id, true);
+            goto usual;
+        }*/
 
         // if row or col is the same, continue moving in the direction of the broken robot
         //if (pref_r == 0 && map.peek(row + pref_r, col + pref_c).status != ROBOT) {
         if (pref_r == 0 && !map.rbots(row + pref_r, col + pref_c)) {
             return pref_c == -1 ? LEFT : RIGHT;
         }
-        else if (pref_r == 0) {
-            return map.in_range(row - 1, col) ? UP : DOWN; 
+        else if (pref_r == 0 && map.rbots(row + pref_r, col + pref_c)) {
+            map.fix(r.loc,r.id, true);
+            goto usual; //return map.in_range(row - 1, col) ? UP : DOWN; 
         }
         //if (pref_c == 0 && map.peek(row + pref_r, col + pref_c).status != ROBOT) {
         if (pref_c == 0 && !map.rbots(row + pref_r, col + pref_c)) {
             return pref_r == -1 ? UP : DOWN;
         }
-        else if (pref_c == 0) {
-            return map.in_range(row, col - 1) ? LEFT : RIGHT;
+        else if (pref_c == 0 && map.rbots(row + pref_r, col + pref_c)) {
+            map.fix(r.loc,r.id, true);
+            goto usual; //return map.in_range(row, col - 1) ? LEFT : RIGHT;
         }
 
         // chooses the field with debris to move to next
@@ -158,35 +166,30 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         if (map.locate(id).target.r == -1 && map.locate(id).target.c == -1) {
             goto usual;
         }
+        
         Loc target_loc = map.locate(id).target;
+        
         if(map.kernel(target_loc) == 0 || !map.in_range(target_loc)) {
             map.nearest(id);
+            goto near;
+            //goto usual;
         }
         
         int target_r = target_loc.r;
         int target_c = target_loc.c;
-        // preferred directions
+
+        if (comploc(target_loc,loc) || (target_r == row && abs(target_c - col) == 1) || (target_c == col && abs(target_r - row) == 1)) {
+            map.unclaim(id);
+            goto usual;
+            //return COLLECT;
+        }
+
         int pref_r = target_r < row ? -1 : 1;
         int pref_c = target_c < col ? -1 : 1;
         pref_r = target_r == row ? 0 : pref_r;
         pref_c = target_c == col ? 0 : pref_c;
-
-        if (comploc(target_loc,loc)) {
-            map.unclaim(id);
-            return COLLECT;
-        }
-
-        if (target_r == row && abs(target_c - col) == 1) {
-            map.unclaim(id);
-            //goto usual;
-            return COLLECT;
-        }
-        if (target_c == col && abs(target_r - row) == 1) {
-            map.unclaim(id);
-            //goto usual;
-            return COLLECT;
-        }
-
+        
+        // preferred directions
         map.update(loc,EMPT);
 
         // chooses the field with debris to move to next
@@ -226,7 +229,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         map.update(loc,EMPT);
         
         if (map.rbots({row + ADJC[0][0],col + ADJC[0][1]}) && map.rbots({row + ADJC[1][0],col + ADJC[1][1]}) && map.rbots({row + ADJC[2][0],col + ADJC[2][1]}) && map.rbots({row + ADJC[3][0],col + ADJC[3][1]})) {
-            return COLLECT;
+            return LEFT;
         }
 
         if ((map.rbots({row + ADJC[0][0],col + ADJC[0][1]}) && map.rbots({row + ADJC[1][0],col + ADJC[1][1]}) && !map.rbots({row + ADJC[2][0],col + ADJC[2][1]}) && map.rbots({row + ADJC[3][0],col + ADJC[3][1]})) || (map.check_l(loc,1,1) > 2 && !map.bots({loc.r, loc.c + 1}))) {
@@ -264,16 +267,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                         checkd[i] = -1;
                         map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]}); 
                     }
-                    /*if ((i == 4 || i == 6) && !map.rbots(row + NEIGHBORS[1][0], col + NEIGHBORS[1][1])) { // diagonals up
-                        check[i + 8] = map.kernelr({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3},6);
-                        checkd[i + 8] = map.kernel({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3},4);
-                        map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]},-1); 
-                    }
-                    if ((i == 5 || i == 7) && !map.rbots(row + NEIGHBORS[2][0], col + NEIGHBORS[2][1])) { // diagonals down
-                        check[i + 8] = map.kernelr({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3},6);
-                        checkd[i + 8] = map.kernel({row + (NEIGHBORS[i][0]*3), col + NEIGHBORS[i][1]*3},4);
-                        map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]},-1); 
-                    }*/  
                     map.treaded({row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]},-1); 
                 }
                 if(i > 7 && map.rbots(row + NEIGHBORS[i - 8][0], col + NEIGHBORS[i - 8][1])) {
@@ -381,7 +374,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             return LEFT;
         }
 
-        if (map.kernel(loc,20) == 0) {
+        if (map.kernel(loc,8) == 0) {
             map.nearest(id);
             log << id << "\t" <<  map.locate(id).target.r << ", " << map.locate(id).target.c << endl;
             //goto near;
@@ -393,7 +386,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         for (int i = 0; i < 4; i++) {
             if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]}) && !map.rbots({row + ADJC[i][0],col + ADJC[i][1]})) {
                 // bonus for previous locations + nearby robots 
-                int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.locate(id).ploc) ? (NUM * 2) + map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) * NUM : map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) * NUM;
+                //int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.locate(id).ploc) ? (NUM * 2) + map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) : map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3});
+                int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.locate(id).ploc) ? (NUM) + map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) : map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3});
 
                 // the calculations for least treaded 
                 best = map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? i : best;
@@ -412,7 +406,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
                 return LEFT;
             }
         }
-
         
         // if there's no place to go just stay there 
         if (best ==  -1) {
