@@ -487,17 +487,28 @@ void Map::fixed (int id) { // upon fixing a robot
 void Map::nearest (int id) {
     Loc loc = robots[id].loc;
     Loc best = loc;
-    int bestd = RSIZE * CSIZE;
+    int bestd = ROWS * COLS;
     int bestk = -1000;
     for (int r = BOUND_R; r < BOUND_RB; r++) {
         for (int c = BOUND_C; c < BOUND_CB; c++) {
             if (in_range(r,c)) {
                 Loc l = {r,c};
-                best = !peek(loc).covered && peek(loc).status == TRASH && bestd > manhattanDist(loc,l) && bestk < kernel(l) - kernelr(l) && kernel(l) > 0? l : best;
+                /*
+                int a = (manhattanDist(l,{r,BOUND_C}) - manhattanDist(loc,l));
+                int b = (manhattanDist(l,{r,BOUND_CB}) - manhattanDist(loc,l));
+                int e = (manhattanDist(l,{BOUND_R,c}) - manhattanDist(loc,l));
+                int d = (manhattanDist(l,{BOUND_RB,c}) - manhattanDist(loc,l));
+                */
+                int a = manhattanDist(loc,l) - manhattanDist(l,{r,BOUND_C});
+                int b = manhattanDist(loc,l) - manhattanDist(l,{r,BOUND_CB});
+                int e = manhattanDist(loc,l) - manhattanDist(l,{BOUND_R,c});
+                int d = manhattanDist(loc,l) - manhattanDist(l,{BOUND_RB,c});
+                int boosted = (a > b) ? ((b > e) ? ((e > d) ? d : e) : ((b > d) ? d : b)) : ((a > e) ? ((e > d) ? d : e) : ((a > d) ? d : a));
+                best = !peek(loc).covered && peek(loc).status == TRASH && bestd > manhattanDist(loc,l) - boosted && bestk < kernel(l) - kernelr(l) && kernel(l) > 0 ? l : best;
             }
         }
     }
-    if (!comploc(loc,robots[id].loc)) {
+    if (!comploc(loc,best)) {
         fields[loc.r][loc.c].covered = true;
         robots[id].target = best;
     }

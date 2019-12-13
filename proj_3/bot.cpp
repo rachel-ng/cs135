@@ -163,6 +163,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
     }
     else if (map.locate(id).target.r != -1 && map.locate(id).target.c != -1) {
         near:
+        log << id << "\t" <<  map.locate(id).target.r << ", " << map.locate(id).target.c << endl;
         if (map.locate(id).target.r == -1 && map.locate(id).target.c == -1) {
             goto usual;
         }
@@ -353,12 +354,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             default: return DOWN;
             }
         }
-        /*int k = 4;
-        for (int i = 5; i < 12; i++) {
-            if (check[i] >= check[k]) {
-                k = i;
-            }
-        } */
         
         // if it's out of bounds it continues to move until it's no longer out of bounds
         if (row <= map.b_r() && map.in_range({map.b_r() + 1,col}) && !map.bots({row + 1,col})) {
@@ -376,6 +371,9 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 
         if (map.kernel(loc,8) == 0) {
             map.nearest(id);
+            if (map.locate(id).target.r != -1 && map.locate(id).target.c != -1) {
+                log << id << "\t" <<  map.locate(id).target.r << ", " << map.locate(id).target.c << endl;
+            }
             log << id << "\t" <<  map.locate(id).target.r << ", " << map.locate(id).target.c << endl;
             //goto near;
         }
@@ -421,6 +419,9 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         
         if (map.kernel(loc,8) == 0) {
             map.nearest(id);
+            if (map.locate(id).target.r != -1 && map.locate(id).target.c != -1) {
+                log << id << "\t" <<  map.locate(id).target.r << ", " << map.locate(id).target.c << endl;
+            }
             log << id << "\t" <<  map.locate(id).target.r << ", " << map.locate(id).target.c << endl;
             goto near;
         }
