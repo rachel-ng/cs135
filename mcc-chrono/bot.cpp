@@ -29,9 +29,11 @@ struct Field {
     Places status;
     Loc loc;
     bool covered;
+    bool claimed;
     int tread;
     int dead;
     int robot;
+    int intended;
 };
 
 class Robot {
@@ -55,7 +57,6 @@ class Map {
     std::vector<std::vector <Field> > fields;
     std::vector<Robot> robots; 
     std::vector<int> dead; 
-    std::vector<bool> claim; 
     int ROWS;
     int COLS;
     int NUM;
@@ -95,6 +96,8 @@ public:
     int kernel (Loc loc, int size);
     int kernelr (Loc loc);
     int kernelr (Loc loc, int size);
+    int kernelc (Loc loc);
+    int kernelc (Loc loc, int size);
     bool update (Loc loc, Places p);
     bool update (Loc loc, Places p, int id);
     void treaded (Loc loc);
@@ -107,7 +110,10 @@ public:
     void fixer (int id, int fix);
     void fixed (int id);
     void nearest (int id);
+    void nearest (int id, Loc loc);
+    void claim (int id, Loc loc);
     void unclaim (int id);
+    void unclaim (Loc loc);
     bool bots(Loc loc);
     bool bots(int row, int col);
     bool rbots(Loc loc);
@@ -172,7 +178,7 @@ Map::Map (int row, int col, int num) {
     BOUND_CB  = COLS;
     BOUND_RB = ROWS;
     piles = ROWS * COLS;
-    fields.resize(ROWS, std::vector<Field>(COLS, {UNDEF,{-1,-1},false,0,0,-1}));
+    fields.resize(ROWS, std::vector<Field>(COLS, {UNDEF,{-1,-1},false, false,0,0,-1,-1}));
     robots.resize(NUM,Robot(-1));
     for (int i = 0; i < NUM; i++) {
         robots[i] = Robot(i);
@@ -211,14 +217,14 @@ Field Map::peek (int row, int col) {
     if (in_og_range(loc)) {
         return fields[row][col];
     }
-    return {UNDEF, {-1,-1},  false, -1, -1, -1};
+    return {UNDEF, {-1,-1},  false, false, -1, -1, -1, -1};
 }
 
 Field Map::peek (Loc loc) {
     if (in_og_range(loc)) {
         return fields[loc.r][loc.c];
     }
-    return {UNDEF, {-1,-1}, false, -1, -1, -1};
+    return {UNDEF, {-1,-1}, false, false, -1, -1, -1, -1};
 }   
 
 int Map::check_u (Loc loc) {
@@ -405,6 +411,41 @@ int Map::kernelr (Loc loc, int size) {  // checks robots of specified kernel
     return yeet;
 }
 
+int Map::kernelc (Loc loc) {  // checks robots of specified kernel
+    int yeet = 0;
+    //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
+    int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
+    int col = (loc.c >= BOUND_C) ? (loc.c > BOUND_CB) ? BOUND_CB : loc.c : BOUND_C;
+
+    for (int r = -3; r <= 3; r++) {
+        for (int c = -3; c <= 3; c++) {
+            if(in_og_range(row + r, col + c) && !comploc(loc,{row + r, col + c})) {
+                if (peek(row + r, col + c).claimed) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
+
+int Map::kernelc (Loc loc, int size) {  // checks robots of specified kernel
+    int yeet = 0;
+    //int row = (loc.r >= BOUND_R) ? (loc.r > map.b_rb()) ? map.b_rb() : loc.r : map.b_r();
+    int row = (loc.r >= BOUND_R) ? (loc.r > BOUND_RB) ? BOUND_RB : loc.r : BOUND_R;
+    int col = (loc.c >= BOUND_C) ? (loc.c > BOUND_CB) ? BOUND_CB : loc.c : BOUND_C;
+
+    for (int r = -size; r <= size; r++) {
+        for (int c = -size; c <= size; c++) {
+            if(in_og_range(row + r, col + c) && !comploc(loc,{row + r, col + c})) {
+                if (peek(row + r, col + c).claimed) {
+                    yeet += 1;
+                }
+            }
+        }
+    }
+    return yeet;
+}
 bool Map::update (Loc loc, Places p) {
     if (in_og_range(loc)) {
         Places prev = fields[loc.r][loc.c].status;
@@ -433,6 +474,7 @@ bool Map::update (Loc loc, Places p) {
             fields[loc.r][loc.c].covered = true;
             fields[loc.r][loc.c].tread += 1;
             fields[loc.r][loc.c].dead += 1;
+            unclaim(loc);
         }
         
         if (p!= TRASH && (loc.r <= BOUND_R || loc.c <= BOUND_C || loc.r > BOUND_RB || loc.c > BOUND_CB)) { 
@@ -536,6 +578,10 @@ void Map::fix (Loc loc, int id) { // fix a robot
     if (robots[id].fixer != -1) {
         return;
     }
+    if (!comploc(robots[id].target,{-1,-1})) {
+        fields[robots[id].target.r][robots[id].target.c].claimed = false;
+        robots[id].target = {-1,-1};
+    }
     // change status to dead
     update(loc,DED,id);
     if (robots[id].fixing != -1) { // assigns new fixer to the robot this was supposed to be fixing (if available)
@@ -566,6 +612,10 @@ void Map::fix (Loc loc, int id, bool force) { // fix a robot
     }
     if (robots[id].fixer != -1 && force) {
         robots[robots[id].fixer].fixing = -1; 
+    }
+    if (!comploc(robots[id].target,{-1,-1})) {
+        fields[robots[id].target.r][robots[id].target.c].claimed = false;
+        robots[id].target = {-1,-1};
     }
     // change status to dead
     update(loc,DED,id);
@@ -616,42 +666,78 @@ void Map::fixed (int id) { // upon fixing a robot
 
 void Map::nearest (int id) {
     Loc loc = robots[id].loc;
-    Loc best = loc;
+    Loc best = {BOUND_R, BOUND_C};
     int bestd = ROWS * COLS;
     int bestk = -1000;
-    Loc bestdl = loc;
-    Loc bestkl = loc;
     for (int r = BOUND_R; r < BOUND_RB; r++) {
         for (int c = BOUND_C; c < BOUND_CB; c++) {
-            if (in_range(r,c)) {
+    /*        if (in_range(r,c)) {
                 Loc l = {r,c};
                 int a = (manhattanDist(l,{r,BOUND_C}) - manhattanDist(loc,l));
                 int b = (manhattanDist(l,{r,BOUND_CB}) - manhattanDist(loc,l));
                 int e = (manhattanDist(l,{BOUND_R,c}) - manhattanDist(loc,l));
                 int d = (manhattanDist(l,{BOUND_RB,c}) - manhattanDist(loc,l));
-                /*
                 int a = manhattanDist(loc,l) - manhattanDist(l,{r,BOUND_C});
                 int b = manhattanDist(loc,l) - manhattanDist(l,{r,BOUND_CB});
                 int e = manhattanDist(loc,l) - manhattanDist(l,{BOUND_R,c});
                 int d = manhattanDist(loc,l) - manhattanDist(l,{BOUND_RB,c});
-                */
                 int boosted = (a > b) ? ((b > e) ? ((e > d) ? d : e) : ((b > d) ? d : b)) : ((a > e) ? ((e > d) ? d : e) : ((a > d) ? d : a));
                 best = !rbots(loc) && !comploc(loc,l) && bestd > manhattanDist(loc,l) && bestk < kernel(l) - kernelr(l) && kernel(l) > 0 ? l : best;
                 bestdl = !rbots(loc) && !comploc(loc,l) && bestd > manhattanDist(loc,l) && kernel(l) > 0 ? l : bestdl;
                 bestkl = !rbots(loc) && !comploc(loc,l) && bestk < kernel(l) - kernelr(l) && kernel(l) > 0 ? l : bestkl;
+      */
+            if (comploc(loc, {r, c}) || peek(r,c).status != TRASH || peek(r,c).covered || peek(r,c).claimed || rbots({r,c})) {
+                continue;
+            }
+            if (manhattanDist(loc, {r, c}) < bestd || bestk < kernel({r,c}) - kernelr({r,c})) {
+                bestd = manhattanDist(loc, {r, c});
+                bestk = kernel({r,c}) - kernelr({r,c});
+                best = {r, c};
             }
         }
     }
-    fields[loc.r][loc.c].covered = true;
+    /*fields[loc.r][loc.c].covered = true;
     robots[id].target = !comploc(best,{-1,-1}) ? best : bestdl;;
     ERR(best.r << ", " << best.c << std::endl);
     ERR(bestdl.r << ", " << bestdl.c << std::endl);
     ERR(bestkl.r << ", " << bestkl.c << std::endl);
     ERR(robots[id].target.r << ", " << robots[id].target.c << std::endl);
+}*/
+
+    if (!comploc(loc, best)) {
+        fields[best.r][best.c].claimed = true;
+        fields[loc.r][loc.c].intended = id;
+        robots[id].target = best;
+        ERR(robots[id].target.r << ", " << robots[id].target.c << endl);
+    }
+}
+
+void Map::nearest (int id, Loc loc) {
+    ERR(loc.r << ", " << loc.c << " -> ");
+    fields[loc.r][loc.c].claimed = true;
+    fields[loc.r][loc.c].intended = id;
+    robots[id].target = loc;
+    ERR(robots[id].target.r << ", " << robots[id].target.c << endl);
+}
+
+
+void Map::claim (int id, Loc loc) {
+    fields[loc.r][loc.c].claimed = true;
+    fields[loc.r][loc.c].intended = id;
 }
 
 void Map::unclaim (int id) {
+    fields[robots[id].target.r][robots[id].target.c].claimed = false;
+    fields[robots[id].target.r][robots[id].target.c].intended = -1;
     robots[id].target = {-1,-1};
+}
+
+void Map::unclaim (Loc loc) {
+    fields[loc.r][loc.c].claimed = false;
+    if (fields[loc.r][loc.c].intended != -1) {
+        robots[fields[loc.r][loc.c].intended].target = {-1,-1};
+        fields[loc.r][loc.c].intended = -1;
+    }
 }
 
 bool Map::bots(Loc loc) { // if alive or dead robots 
@@ -886,13 +972,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 
         if (map.rbots({row + ADJC[0][0],col + ADJC[0][1]}) && map.rbots({row + ADJC[1][0],col + ADJC[1][1]}) && map.rbots({row + ADJC[2][0],col + ADJC[2][1]}) && map.rbots({row + ADJC[3][0],col + ADJC[3][1]})) {
             map.fix(r->loc,r->id, true);
-            return LEFT;
+            return REPAIR_UP;
         }
-
-        /*if (comploc(loc, map.locate(id).ploc)) {
-            map.fix(r.loc,r.id, true);
-            goto usual;
-        }*/
 
         // if row or col is the same, continue moving in the direction of the broken robot
         //if (pref_r == 0 && map.peek(row + pref_r, col + pref_c).status != ROBOT) {
@@ -937,19 +1018,19 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             return pref_c == 1 ? LEFT : RIGHT;
         }
         
-        switch(rand() % 1) {
-		case 0: return pref_r == 1 ? UP : DOWN;
-        default: return pref_c == 1 ? LEFT : RIGHT;
-		}
+        map.fix(r->loc,r->id, true);
+        goto usual;
     }
     else if (!comploc(map.robot(id)->target,{-1,-1})) {
         near:
+        ERR("Label: near" << std::endl);
         //ERR("near" << std::endl);
         
-        if (comploc(map.robot(id)->target,{-1,-1}) || !map.in_range(map.robot(id)->target)) {
+        if (comploc(map.robot(id)->target,{-1,-1}) || !map.in_range(map.robot(id)->target) || map.peek(map.robot(id)->target).covered || map.peek(map.robot(id)->target).claimed || map.rbots(map.robot(id)->target)) {
             //ERR("in range" << std::endl);
             map.unclaim(id);
-            goto usual;
+            ERR("Goto: usual 939" << std::endl);
+            return REPAIR_UP;
         }
         
         //ERR("in range" << std::endl);
@@ -960,8 +1041,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             //ERR("debris" << std::endl);
             map.nearest(id);
             log << map.robot(id)->target.r << ", " << map.robot(id)->target.c << endl;
-
-            goto near;
+            ERR("Goto: near 951" << std::endl);
+            goto usual;
             //goto usual;
         }
         
@@ -971,6 +1052,7 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         if (comploc(target_loc,loc) || (target_r == row && abs(target_c - col) == 1) || (target_c == col && abs(target_r - row) == 1)) {
             //ERR("unclaim" << std::endl);
             map.unclaim(id);
+            ERR("Goto: usual 962" << std::endl);
             goto usual;
             //return COLLECT;
         }
@@ -993,7 +1075,13 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             map.unclaim(id);
             return pref_c == -1 ? LEFT : RIGHT;
         }
-                
+        
+        if (pref_r == 0) { //No vertical movement
+            return pref_c == -1 ? LEFT : RIGHT;
+        }
+        if (pref_c == 0) {
+            return pref_r == -1 ? UP : DOWN;
+        }
         // choose a random spot
         //if (map.in_range({row + pref_r,col}) && map.peek(row + pref_r, col).status != ROBOT) {
         if (map.in_range({row + pref_r,col}) && !map.rbots(row + pref_r, col)) {
@@ -1017,14 +1105,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		}
     }
     else {
-        if (map.kernel(loc,6) == 0) {
-            map.nearest(id);
-            log << id << "\t" <<  map.robot(id)->target.r << ", " << map.robot(id)->target.c << endl;
-            //ERR(map.robot(id)->target.r << ", " << map.robot(id)->target.c << std::endl);
-            goto near;
-        }
-        
         usual:
+        ERR("Label: usual" << endl);
         map.update(loc,EMPT);
         
         if (map.rbots({row + ADJC[0][0],col + ADJC[0][1]}) && map.rbots({row + ADJC[1][0],col + ADJC[1][1]}) && map.rbots({row + ADJC[2][0],col + ADJC[2][1]}) && map.rbots({row + ADJC[3][0],col + ADJC[3][1]})) {
@@ -1044,7 +1126,6 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             return UP;
         }
         
-        
         // set up for kernel checking 
         int check [17] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, ROWS * COLS}; // robots
         int checkd [17] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1}; // debris
@@ -1053,8 +1134,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         int move = 16;
         int moved = 16;
         for (int i = 0; i < 12; i++) {
-            if(map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == TRASH) {
-                check[i] = map.kernelr({row + (NEIGHBORS[i][0]*4), col + NEIGHBORS[i][1]*4},6);
+            if(map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).status == TRASH && (!map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).claimed || map.peek(row + NEIGHBORS[i][0], col + NEIGHBORS[i][1]).intended == id)) {
+                check[i] = map.kernelr({row + (NEIGHBORS[i][0]*4), col + NEIGHBORS[i][1]*4},3);
                 checkd[i] = map.kernel({row + (NEIGHBORS[i][0]*4), col + NEIGHBORS[i][1]*4},4);
                 if(i > 3 && i < 8) { // diagonal neighbors
                     if ((i == 4 || i == 5) && map.rbots(row + NEIGHBORS[0][0], col + NEIGHBORS[0][1])) { // diagonals up
@@ -1080,17 +1161,22 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             }
             
             move = check[i] != -1 && check[i] < check[move] ? i : move;
-            moved = checkd[i] != -1 && checkd[i] < checkd[move] ? i : moved;
+            moved = checkd[i] != -1 && checkd[i] > checkd[move] ? i : moved;
         }
         
         int yote = 16;
         for (int i = 0; i < 17; i ++) {
             yote = checkd[yote] - (check[yote]) > checkd[i] - (check[i]) && checkd[i] > 0 ? i : yote;
         }
-
+        
         // best of the 2
         if (yote != 16) { 
-            switch(yote) {
+            //map.nearest(id, {row + NEIGHBORS[yote][0], col + NEIGHBORS[yote][1]});
+            ERR("yeet yote throw me off a boat" << std::endl);
+
+            map.nearest(id, {row + NEIGHBORS[yote > 11 ? yote - 8 : yote][0], col + NEIGHBORS[yote > 11 ? yote - 8 : yote][1]});
+            goto near;
+            /*switch(yote) {
             case 0: return UP;
             case 1: return LEFT;
             case 2: return RIGHT;
@@ -1107,11 +1193,13 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             case 13: return LEFT;
             case 14: return RIGHT;
             default: return DOWN;
-            }
+            }*/
         }
         
         // less robots 
-        if (move != 16) { 
+        if (move != 16) {
+            ERR("Damn y'all doing this one huh" << std::endl);
+            map.claim(id, {row + NEIGHBORS[move > 11 ? move - 8 : move][0], col + NEIGHBORS[move > 11 ? move - 8 : move][1]});
             switch(move) {
             case 0: return UP;
             case 1: return LEFT;
@@ -1146,7 +1234,22 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             return LEFT;
         }
 
-        
+        if (map.kernel(loc,20) <= 0) {
+            Loc save = map.robot(id)->target;
+            
+            map.nearest(id);
+            if (comploc(map.robot(id)->target,save)) {
+                return COLLECT;
+            }
+            ERR(save.r << ":" << save.c << " -> ");
+            ERR(map.robot(id)->target.r << ":" << map.robot(id)->target.c << endl);
+            log << id << "\t" <<  map.robot(id)->target.r << ", " << map.robot(id)->target.c << endl;
+            //ERR(map.robot(id)->target.r << ", " << map.robot(id)->target.c << std::endl);
+            ERR("Goto: near 1015" << std::endl);
+            goto near;
+        }
+
+        ERR("Damn you made it to treaded" << std::endl);
         // choose the least treaded on field
         int best = -1;
         int bestv = ROWS * COLS;
@@ -1154,7 +1257,9 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
             if (map.in_range({row + ADJC[i][0],col + ADJC[i][1]}) && !map.rbots({row + ADJC[i][0],col + ADJC[i][1]})) {
                 // bonus for previous locations + nearby robots 
                 //int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.locate(id).ploc) ? (NUM * 2) + map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) : map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3});
-                int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.robot(id)->ploc) ? (NUM) + map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) : map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3});
+                int robonus = comploc(map.peek(row + ADJC[i][0],col + ADJC[i][1]).loc, map.robot(id)->ploc) ? 
+                    (NUM) + map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) + (map.kernelc({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) * 2) : 
+                    map.kernelr({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) - map.kernel({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) + (map.kernelc({row + (ADJC[i][0]*3), col + ADJC[i][1]*3}) * 2);
 
                 // the calculations for least treaded 
                 best = map.peek({row + ADJC[i][0],col + ADJC[i][1]}).tread + robonus < bestv ? i : best;
@@ -1176,7 +1281,8 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
         
         // if there's no place to go just stay there 
         if (best ==  -1) {
-            return COLLECT;
+            map.nearest(id);
+            goto near;
         }
 
         switch(best) {
@@ -1186,12 +1292,10 @@ Action onRobotAction(int id, Loc loc, Area &area, ostream &log) {
 		default: return DOWN;
 		}
         
-        if (map.kernel(loc,8) == 0) {
-            map.nearest(id);
-            //ERR(map.robot(id)->target.r << ", " << map.robot(id)->target.c << std::endl);
-            //log << id << "\t" <<  map.robot(id)->target.r << ", " << map.robot(id)->target.c << endl;
-            goto near;
-        }
+        map.nearest(id);
+        //ERR(map.robot(id)->target.r << ", " << map.robot(id)->target.c << std::endl);
+        //log << id << "\t" <<  map.robot(id)->target.r << ", " << map.robot(id)->target.c << endl;
+        goto near;
 	}
 }
 
