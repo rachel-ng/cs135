@@ -1,4 +1,4 @@
-# csci135
+# cs 135
 
 [csci135 class page](https://maryash.github.io/135/2019_fall.html)
 
