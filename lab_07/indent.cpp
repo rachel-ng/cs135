@@ -35,7 +35,7 @@ int countChar(std::string line, char c) {
 std::string tabs (int n) {
     std::string t = "";
     for (int i = 0; i < n; i++) {
-        t += "\t";
+        t += "    ";
     }
     return t;
 }
