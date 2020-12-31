@@ -1,0 +1,8 @@
+Reviewed by: Anne
+- Line 11 of funcs.cpp, there is no need for the !=0, that says “is not false” so you could just say “is true” or you can just do isspace() and it makes the code clearer.
+- Additionally your brackets are indented wrong in the first couple of functions and it makes the code a bit more confusing.
+- You have at least four variables in different functions called “tracker”, I would advise specifying which is tracking what.
+- I would advise that you use more test cases to test every function in the file to pinpoint where the problem is.
+- Additionally, in your unindent function, you are not returning anything, which is why the indent function further down isn’t working.
+- Also, in your makefile you don’t have the flag to change it to the correct version of C++, which is why the makefile doesn’t work.
+- I like how you use while loops, it’s easier than how I do things using for loops.
